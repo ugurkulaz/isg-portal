@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>İSG Portal — İş Sağlığı ve Güvenliği Yönetim Sistemi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green:        #1D9E75;
+      --green-light:  #E1F5EE;
+      --green-dark:   #085041;
+      --amber:        #BA7517;
+      --amber-light:  #FAEEDA;
+      --amber-dark:   #633806;
+      --red:          #E24B4A;
+      --red-light:    #FCEBEB;
+      --red-dark:     #791F1F;
+      --blue:         #185FA5;
+      --blue-light:   #E6F1FB;
+      --blue-dark:    #0C447C;
+      --bg:           #F5F5F2;
+      --surface:      #FFFFFF;
+      --surface2:     #F8F7F4;
+      --border:       rgba(0,0,0,0.09);
+      --border2:      rgba(0,0,0,0.14);
+      --text:         #1A1A18;
+      --text2:        #5F5E5A;
+      --text3:        #888780;
+      --sidebar-w:    264px;
+      --radius:       10px;
+      --radius-sm:    7px;
+      --shadow:       0 1px 4px rgba(0,0,0,0.07);
+    }
+    html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
+
+    /* ── LAYOUT ── */
+    .app { display: flex; height: 100vh; overflow: hidden; }
+    .sidebar { width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; overflow-y: auto; }
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .topbar { height: 58px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 10px; flex-shrink: 0; }
+    .content { flex: 1; overflow-y: auto; padding: 24px; }
+
+    /* ── SIDEBAR ── */
+    .logo-area { padding: 16px 16px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 11px; }
+    .logo-icon { width: 34px; height: 34px; background: var(--green); border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .logo-icon svg { width: 19px; height: 19px; fill: white; }
+    .logo-name { font-size: 15px; font-weight: 600; color: var(--text); line-height: 1.2; }
+    .logo-sub { font-size: 10px; color: var(--text3); }
+
+    .s-section { padding: 12px 10px 4px; }
+    .s-label { font-size: 10px; font-weight: 600; color: var(--text3); letter-spacing: .07em; text-transform: uppercase; padding: 0 6px 6px; }
+    .firma-select { width: 100%; padding: 7px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); font-size: 12px; font-family: inherit; background: var(--surface2); color: var(--text); margin-bottom: 6px; cursor: pointer; }
+    .firma-select:focus { outline: 2px solid var(--green); }
+
+    .nav { display: flex; flex-direction: column; gap: 1px; }
+    .nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; color: var(--text2); transition: background .12s, color .12s; user-select: none; }
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
+    .nav-item.active { background: var(--green-light); color: var(--green-dark); font-weight: 500; }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .nav-badge { margin-left: auto; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; }
+    .badge-red   { background: var(--red-light); color: var(--red-dark); }
+    .badge-amber { background: var(--amber-light); color: var(--amber-dark); }
+    .badge-green { background: var(--green-light); color: var(--green-dark); }
+    .badge-blue  { background: var(--blue-light); color: var(--blue-dark); }
+    .nav-sub .nav-item { padding-left: 34px; font-size: 12px; padding-top: 6px; padding-bottom: 6px; }
+    .divider { height: 1px; background: var(--border); margin: 6px 10px; }
+
+    /* ── TOPBAR ── */
+    .breadcrumb { font-size: 12px; color: var(--text3); }
+    .page-title { font-size: 15px; font-weight: 600; color: var(--text); }
+    .tb-right { margin-left: auto; display: flex; gap: 8px; }
+    .btn { padding: 7px 14px; border: 1px solid var(--border2); border-radius: var(--radius-sm); font-size: 12px; font-family: inherit; cursor: pointer; background: var(--surface); color: var(--text); display: flex; align-items: center; gap: 6px; transition: background .12s; }
+    .btn:hover { background: var(--surface2); }
+    .btn.primary { background: var(--green); color: white; border-color: var(--green); font-weight: 500; }
+    .btn.primary:hover { background: #189060; }
+    .btn.danger  { background: var(--red-light); color: var(--red-dark); border-color: var(--red); }
+
+    /* ── STAT CARDS ── */
+    .stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 14px; margin-bottom: 22px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; }
+    .stat-label { font-size: 11px; color: var(--text3); margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
+    .stat-value { font-size: 28px; font-weight: 600; line-height: 1; }
+    .stat-sub { font-size: 11px; margin-top: 6px; color: var(--text3); }
+    .c-green { color: var(--green); }
+    .c-amber { color: var(--amber); }
+    .c-red   { color: var(--red); }
+    .c-blue  { color: var(--blue); }
+
+    /* ── TABS ── */
+    .tabs-bar { display: flex; gap: 2px; background: var(--surface2); padding: 3px; border-radius: var(--radius-sm); width: fit-content; margin-bottom: 18px; border: 1px solid var(--border); }
+    .tab { padding: 7px 16px; border-radius: 6px; font-size: 13px; cursor: pointer; color: var(--text2); transition: background .12s; user-select: none; }
+    .tab:hover { background: rgba(255,255,255,.6); }
+    .tab.active { background: var(--surface); color: var(--text); font-weight: 500; box-shadow: var(--shadow); }
+
+    /* ── CARD ── */
+    .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .card-header { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: 1px solid var(--border); }
+    .card-title { font-size: 13px; font-weight: 600; color: var(--text); }
+    .card-body { padding: 18px; }
+
+    /* ── TABLE ── */
+    .toolbar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .search-inp { padding: 7px 11px; border: 1px solid var(--border2); border-radius: var(--radius-sm); font-size: 12px; font-family: inherit; background: var(--surface2); color: var(--text); width: 220px; }
+    .search-inp:focus { outline: 2px solid var(--green); }
+    .filter-sel { padding: 7px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); font-size: 12px; font-family: inherit; background: var(--surface2); color: var(--text); cursor: pointer; }
+    .tb-right-tools { margin-left: auto; display: flex; gap: 6px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th { padding: 10px 16px; text-align: left; font-weight: 600; font-size: 10px; color: var(--text3); background: var(--surface2); border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+    tbody td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: #FAFAF8; }
+
+    /* ── STATUS LAMP ── */
+    .lamp { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; padding: 3px 9px; border-radius: 99px; font-weight: 500; white-space: nowrap; }
+    .lamp-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .lamp-green { background: var(--green-light); color: var(--green-dark); }
+    .lamp-green .lamp-dot { background: var(--green); }
+    .lamp-amber { background: var(--amber-light); color: var(--amber-dark); }
+    .lamp-amber .lamp-dot { background: var(--amber); }
+    .lamp-red   { background: var(--red-light); color: var(--red-dark); }
+    .lamp-red   .lamp-dot { background: var(--red); }
+
+    /* ── BADGE ── */
+    .badge { display: inline-block; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; }
+
+    /* ── PERSON CELL ── */
+    .person-cell { display: flex; align-items: center; gap: 10px; }
+    .avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; flex-shrink: 0; }
+
+    /* ── SPLIT LAYOUT ── */
+    .split { display: flex; gap: 18px; align-items: flex-start; }
+    .split-main { flex: 1; min-width: 0; }
+    .split-side { width: 230px; flex-shrink: 0; display: flex; flex-direction: column; gap: 14px; }
+
+    /* ── SIDE PANEL ── */
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+    .panel-title { font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 12px; }
+    .mini-bar { margin-bottom: 10px; }
+    .mini-bar-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); margin-bottom: 3px; }
+    .mini-track { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; border: 1px solid var(--border); }
+    .mini-fill { height: 100%; border-radius: 3px; }
+    .alert-row { display: flex; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--text2); line-height: 1.4; }
+    .alert-row:last-child { border-bottom: none; }
+    .alert-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+
+    /* ── FIRMA DETAY ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-field label { display: block; font-size: 11px; color: var(--text3); font-weight: 500; margin-bottom: 4px; }
+    .form-field .fval { font-size: 14px; font-weight: 500; color: var(--text); }
+    .form-field input, .form-field select { width: 100%; padding: 8px 10px; border: 1px solid var(--border2); border-radius: var(--radius-sm); font-size: 13px; font-family: inherit; background: var(--surface2); color: var(--text); }
+    .form-field input:focus, .form-field select:focus { outline: 2px solid var(--green); }
+    .full-col { grid-column: 1 / -1; }
+    .periyot-box { border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 2px; }
+
+    /* ── MUAYENE FORMU ── */
+    .checklist { display: flex; flex-direction: column; gap: 8px; }
+    .check-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; transition: background .1s; }
+    .check-item:hover { background: var(--surface2); }
+    .check-item input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--green); cursor: pointer; }
+    .check-item.checked { background: var(--green-light); border-color: rgba(29,158,117,.3); }
+
+    /* ── EĞİTİM ── */
+    .egitim-row { display: grid; grid-template-columns: 1fr 120px 100px 120px 100px 80px; gap: 10px; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .egitim-row.header { background: var(--surface2); font-size: 10px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; }
+    .progress-bar { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+    .progress-fill { height: 100%; border-radius: 4px; background: var(--green); }
+
+    /* ── MODAL ── */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--surface); border-radius: var(--radius); width: 520px; max-width: 95vw; max-height: 88vh; overflow-y: auto; box-shadow: 0 8px 40px rgba(0,0,0,.18); }
+    .modal-head { display: flex; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .modal-head h3 { font-size: 15px; font-weight: 600; flex: 1; }
+    .modal-close { width: 28px; height: 28px; border: none; background: none; cursor: pointer; font-size: 18px; color: var(--text3); border-radius: 6px; }
+    .modal-close:hover { background: var(--surface2); }
+    .modal-body { padding: 20px; }
+    .modal-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+
+    /* ── TOAST ── */
+    #toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #fff; padding: 10px 18px; border-radius: var(--radius-sm); font-size: 13px; z-index: 999; opacity: 0; transform: translateY(10px); transition: all .25s; pointer-events: none; }
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── UPLOAD AREA ── */
+    .upload-zone { border: 2px dashed var(--border2); border-radius: var(--radius); padding: 32px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s; }
+    .upload-zone:hover { border-color: var(--green); background: var(--green-light); }
+    .upload-zone svg { width: 36px; height: 36px; margin: 0 auto 10px; display: block; fill: var(--text3); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+      .split { flex-direction: column; }
+      .split-side { width: 100%; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 700px) {
+      .sidebar { display: none; }
+      .stat-grid { grid-template-columns: repeat(2,1fr); }
+    }
+
+    /* ── VIEW HIDE ── */
+    .view { display: none; }
+    .view.active { display: block; }
+    .tab-view { display: none; }
+    .tab-view.active { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <div class="logo-area">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.5L20 8.8v6.4L12 18.5l-8-3.3V8.8L12 4.5z"/></svg>
+      </div>
+      <div>
+        <div class="logo-name">İSG Portal</div>
+        <div class="logo-sub">İş Sağlığı ve Güvenliği</div>
+      </div>
+    </div>
+
+    <div class="s-section">
+      <div class="s-label">Hizmet Sağlayan Firmalar</div>
+      <select class="firma-select" onchange="changeFirma(this.value)">
+        <option value="all">Tüm Firmalar</option>
+        <option value="abc">ABC Metal San. A.Ş.</option>
+        <option value="xyz">XYZ Lojistik Ltd. Şti.</option>
+        <option value="demo">Demo Tekstil A.Ş.</option>
+      </select>
+
+      <div class="nav">
+        <!-- A. Firma ve Personel -->
+        <div class="nav-item active" id="nav-firma" onclick="switchModule('firma')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/></svg>
+          Firma ve Personel
+        </div>
+        <div class="nav-sub" id="sub-firma">
+          <div class="nav nav-sub">
+            <div class="nav-item active" id="subnav-firma" onclick="switchTab('firma')">Firma Bilgileri</div>
+            <div class="nav-item" id="subnav-personel" onclick="switchTab('personel')">Personel Listesi</div>
+            <div class="nav-item" id="subnav-durum" onclick="switchTab('durum')">
+              Eğitim &amp; Muayene
+              <span class="nav-badge badge-red">12</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- B. Sağlık -->
+        <div class="nav-item" id="nav-saglik" onclick="switchModule('saglik')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6H9v-2h2V7h2v2h2v2h-2v6z"/></svg>
+          Sağlık &amp; Muayene Takibi
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- C. Eğitim -->
+        <div class="nav-item" id="nav-egitim" onclick="switchModule('egitim')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm-7 9.18V16l7 3.82 7-3.82v-3.82L12 16l-7-3.82z"/></svg>
+          Eğitim Takip
+          <span class="nav-badge badge-amber">3</span>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Raporlar -->
+        <div class="nav-item" id="nav-rapor" onclick="switchModule('rapor')">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+          Raporlar &amp; Analiz
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <span class="breadcrumb" id="tb-breadcrumb">Firmalar /</span>
+      <span class="page-title" id="tb-title">Firma ve Personel Yönetimi</span>
+      <div class="tb-right">
+        <button class="btn" onclick="openModal('modal-excel')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
+          Excel Yükle
+        </button>
+        <button class="btn primary" onclick="openModal('modal-personel')">+ Personel Ekle</button>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- ══ STAT CARDS (global) ══ -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">Toplam Personel</div>
+          <div class="stat-value">247</div>
+          <div class="stat-sub">3 firmada aktif</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Güncel</div>
+          <div class="stat-value c-green">189</div>
+          <div class="stat-sub">%76.5 uyum</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Yaklaşıyor (&lt;30 gün)</div>
+          <div class="stat-value c-amber">34</div>
+          <div class="stat-sub">Uyarı gönderildi</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Süresi Geçmiş / Eksik</div>
+          <div class="stat-value c-red">24</div>
+          <div class="stat-sub">Acil aksiyon gerekli</div>
+        </div>
+      </div>
+
+      <!-- ══ MODULE: FİRMA VE PERSONEL ══ -->
+      <div class="view active" id="view-firma">
+        <div class="tabs-bar">
+          <div class="tab active" id="tab-firma" onclick="switchTab('firma')">Firma Bilgileri</div>
+          <div class="tab" id="tab-personel" onclick="switchTab('personel')">Personel Listesi</div>
+          <div class="tab" id="tab-durum" onclick="switchTab('durum')">Eğitim &amp; Muayene Durumu</div>
+        </div>
+
+        <!-- TAB: Firma Bilgileri -->
+        <div class="tab-view active" id="tabv-firma">
+          <div class="split">
+            <div class="split-main">
+              <div class="card">
+                <div class="card-header">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="var(--green)"><path d="M12 2L2 7v10l10 5 10-5V7L12 2z"/></svg>
+                  <span class="card-title">ABC Metal San. A.Ş. — Firma Bilgileri</span>
+                  <button class="btn" style="margin-left:auto;font-size:11px;padding:5px 10px;" onclick="toast('Firma bilgileri kaydedildi ✓')">Kaydet</button>
+                </div>
+                <div class="card-body">
+                  <div class="form-grid">
+                    <div class="form-field">
+                      <label>Firma Adı</label>
+                      <input value="ABC Metal San. A.Ş." />
+                    </div>
+                    <div class="form-field">
+                      <label>Tehlike Sınıfı</label>
+                      <select onchange="updatePeriyot(this.value)">
+                        <option value="cok">Çok Tehlikeli</option>
+                        <option value="tehlikeli">Tehlikeli</option>
+                        <option value="az">Az Tehlikeli</option>
+                      </select>
+                    </div>
+                    <div class="form-field">
+                      <label>İş Kolu / Faaliyet</label>
+                      <input value="Metal İmalat ve Döküm" />
+                    </div>
+                    <div class="form-field">
+                      <label>NACE Kodu</label>
+                      <input value="24.51" />
+                    </div>
+                    <div class="form-field full-col">
+                      <label>Bildirim Mail Grubu (virgülle ayırın)</label>
+                      <input value="isg@abc-metal.com, ik@abc-metal.com, yonetim@abc-metal.com" />
+                    </div>
+                  </div>
+
+                  <div style="margin-top:20px;">
+                    <div style="font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">⚡ Üst Limit Kilidi — Otomatik Yasal Periyot Hesabı</div>
+                    <div style="display:flex;gap:10px;" id="periyot-boxes">
+                      <div class="periyot-box" style="flex:1;background:var(--red-light);border:1px solid rgba(226,75,74,.25);">
+                        <div style="font-size:10px;font-weight:700;color:var(--red-dark);text-transform:uppercase;letter-spacing:.05em;">Grup 3 · Çok Tehlikeli</div>
+                        <div style="font-size:22px;font-weight:700;color:var(--red-dark);margin:4px 0;">1 Yıl</div>
+                        <div style="font-size:11px;color:var(--red);">Muayene · 16 saat/yıl eğitim</div>
+                        <div id="g3-tavan" style="font-size:10px;color:var(--red-dark);margin-top:4px;font-weight:600;">← Aktif Tavan (Firma Çok Tehlikeli)</div>
+                      </div>
+                      <div class="periyot-box" style="flex:1;background:var(--amber-light);border:1px solid rgba(186,117,23,.25);opacity:.55;" id="p-g2">
+                        <div style="font-size:10px;font-weight:700;color:var(--amber-dark);text-transform:uppercase;letter-spacing:.05em;">Grup 2 · Tehlikeli</div>
+                        <div style="font-size:22px;font-weight:700;color:var(--amber-dark);margin:4px 0;">3 Yıl</div>
+                        <div style="font-size:11px;color:var(--amber);">Muayene · 12 saat/2yıl eğitim</div>
+                      </div>
+                      <div class="periyot-box" style="flex:1;background:var(--green-light);border:1px solid rgba(29,158,117,.25);opacity:.55;" id="p-g1">
+                        <div style="font-size:10px;font-weight:700;color:var(--green-dark);text-transform:uppercase;letter-spacing:.05em;">Grup 1 · Az Tehlikeli</div>
+                        <div style="font-size:22px;font-weight:700;color:var(--green-dark);margin:4px 0;">5 Yıl</div>
+                        <div style="font-size:11px;color:var(--green);">Muayene · 8 saat/3yıl eğitim</div>
+                      </div>
+                    </div>
+                    <div style="font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-top:10px;color:var(--text2);" id="periyot-info">
+                      Bu firma <strong>Çok Tehlikeli</strong> sınıfında olduğundan, tüm personel gruplarına <strong>1 Yıl</strong> tavan süresi otomatik uygulanır. Yasal süre asla aşılamaz.
+                    </div>
+                    <div style="font-size:11px;background:var(--amber-light);border:1px solid rgba(186,117,23,.25);border-radius:var(--radius-sm);padding:10px 12px;margin-top:8px;color:var(--amber-dark);">
+                      <strong>Özel Politika:</strong> Gebe, engelli vb. çalışanlarda muayene süresi her koşulda <strong>6 ay</strong>dır.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="split-side">
+              <div class="panel">
+                <div class="panel-title">Uyum Özeti</div>
+                <div class="mini-bar">
+                  <div class="mini-bar-row"><span>Güncel</span><span class="c-green" style="font-weight:600;">189</span></div>
+                  <div class="mini-track"><div class="mini-fill" style="width:76%;background:var(--green);"></div></div>
+                </div>
+                <div class="mini-bar">
+                  <div class="mini-bar-row"><span>Yaklaşıyor</span><span class="c-amber" style="font-weight:600;">34</span></div>
+                  <div class="mini-track"><div class="mini-fill" style="width:14%;background:var(--amber);"></div></div>
+                </div>
+                <div class="mini-bar">
+                  <div class="mini-bar-row"><span>Geçmiş / Eksik</span><span class="c-red" style="font-weight:600;">24</span></div>
+                  <div class="mini-track"><div class="mini-fill" style="width:10%;background:var(--red);"></div></div>
+                </div>
+              </div>
+              <div class="panel">
+                <div class="panel-title">Otomatik Servisler (CRON)</div>
+                <div style="font-size:12px;color:var(--text2);line-height:2.2;">
+                  <div>📅 Haftalık özet — Her Pazartesi 09:00</div>
+                  <div>⏰ 30 gün kala vade uyarısı</div>
+                  <div>⏰ Bitiş günü acil bildirim</div>
+                  <div>📊 Yıl sonu analiz raporu</div>
+                  <div>🔄 İK senkronizasyonu (pasif)</div>
+                </div>
+              </div>
+              <div class="panel">
+                <div class="panel-title">Son Bildirimler</div>
+                <div class="alert-row"><div class="alert-dot" style="background:var(--red);"></div><div>Ahmet Yıldız — Muayene süresi doldu</div></div>
+                <div class="alert-row"><div class="alert-dot" style="background:var(--amber);"></div><div>Fatma Demir — 15 gün kaldı</div></div>
+                <div class="alert-row"><div class="alert-dot" style="background:var(--amber);"></div><div>3 kişi — Eğitim 30 gün içinde</div></div>
+                <div class="alert-row"><div class="alert-dot" style="background:var(--blue);"></div><div>İK sync: 2 personel pasife alındı</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: Personel Listesi -->
+        <div class="tab-view" id="tabv-personel">
+          <div class="card">
+            <div class="toolbar">
+              <input class="search-inp" placeholder="Ad, soyad veya TC ara..." oninput="filterTable(this.value)" />
+              <select class="filter-sel" onchange="filterGrup(this.value)">
+                <option value="">Tüm Gruplar</option>
+                <option value="Grup 3">Grup 3</option>
+                <option value="Grup 2">Grup 2</option>
+                <option value="Grup 1">Grup 1</option>
+              </select>
+              <select class="filter-sel">
+                <option>Tüm Durumlar</option>
+                <option>Aktif</option>
+                <option>Pasif</option>
+              </select>
+              <div class="tb-right-tools">
+                <button class="btn" onclick="toast('Excel indiriliyor…')">Excel ↓</button>
+                <button class="btn" onclick="toast('PDF oluşturuluyor…')">PDF ↓</button>
+                <button class="btn primary" onclick="openModal('modal-personel')">+ Ekle</button>
+              </div>
+            </div>
+            <table id="personel-table">
+              <thead>
+                <tr>
+                  <th>Personel</th>
+                  <th>TC Kimlik No</th>
+                  <th>Unvan</th>
+                  <th>Grup</th>
+                  <th>İşe Giriş</th>
+                  <th>Durum</th>
+                  <th>İşlem</th>
+                </tr>
+              </thead>
+              <tbody id="personel-tbody">
+                <!-- rows injected by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- TAB: Eğitim & Muayene Durumu -->
+        <div class="tab-view" id="tabv-durum">
+          <div class="split">
+            <div class="split-main">
+              <div class="card">
+                <div class="toolbar">
+                  <select class="filter-sel">
+                    <option>Tüm Gruplar</option>
+                    <option>Grup 1</option><option>Grup 2</option><option>Grup 3</option>
+                  </select>
+                  <select class="filter-sel">
+                    <option>Eğitim Durumu</option>
+                    <option>Güncel</option><option>Yaklaşıyor</option><option>Geçmiş</option>
+                  </select>
+                  <select class="filter-sel">
+                    <option>Sağlık Durumu</option>
+                    <option>Güncel</option><option>Kısıtlı</option><option>Geçmiş</option>
+                  </select>
+                  <select class="filter-sel">
+                    <option>Kısıt</option>
+                    <option>Yok</option><option>Var</option>
+                  </select>
+                  <div class="tb-right-tools">
+                    <button class="btn" onclick="toast('Filtrelenmiş liste Excel'e aktarıldı ✓')">Excel ↓</button>
+                    <button class="btn" onclick="toast('PDF oluşturuluyor…')">PDF ↓</button>
+                  </div>
+                </div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Personel</th>
+                      <th>Grup</th>
+                      <th>Eğitim Durumu</th>
+                      <th>Saat (Tamamlanan)</th>
+                      <th>Muayene</th>
+                      <th>Kısıt Notu</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><div class="person-cell"><div class="avatar" style="background:var(--red-light);color:var(--red-dark);">AY</div><div><div style="font-weight:500;">Ahmet Yıldız</div><div style="font-size:11px;color:var(--text3);">Makine Op.</div></div></div></td>
+                      <td><span class="badge badge-red">Grup 3</span></td>
+                      <td><span class="lamp lamp-green"><span class="lamp-dot"></span>Güncel</span></td>
+                      <td><div>14/16 saat</div><div class="progress-bar" style="margin-top:4px;width:100px;"><div class="progress-fill" style="width:87%;"></div></div></td>
+                      <td><span class="lamp lamp-red"><span class="lamp-dot"></span>Süresi Geçmiş</span></td>
+                      <td style="font-size:12px;color:var(--text3);">—</td>
+                    </tr>
+                    <tr>
+                      <td><div class="person-cell"><div class="avatar" style="background:var(--amber-light);color:var(--amber-dark);">FD</div><div><div style="font-weight:500;">Fatma Demir</div><div style="font-size:11px;color:var(--text3);">Kaynak Tek.</div></div></div></td>
+                      <td><span class="badge badge-red">Grup 3</span></td>
+                      <td><span class="lamp lamp-amber"><span class="lamp-dot"></span>15 gün kaldı</span></td>
+                      <td><div>16/16 saat</div><div class="progress-bar" style="margin-top:4px;width:100px;"><div class="progress-fill" style="width:100%;"></div></div></td>
+                      <td><span class="lamp lamp-amber"><span class="lamp-dot"></span>28 gün kaldı</span></td>
+                      <td style="font-size:12px;color:var(--red);font-weight:500;">Tek Çalışamaz</td>
+                    </tr>
+                    <tr>
+                      <td><div class="person-cell"><div class="avatar" style="background:var(--green-light);color:var(--green-dark);">MK</div><div><div style="font-weight:500;">Mustafa Kaya</div><div style="font-size:11px;color:var(--text3);">İdari Personel</div></div></div></td>
+                      <td><span class="badge badge-amber">Grup 2</span></td>
+                      <td><span class="lamp lamp-green"><span class="lamp-dot"></span>Güncel</span></td>
+                      <td><div>12/12 saat</div><div class="progress-bar" style="margin-top:4px;width:100px;"><div class="progress-fill" style="width:100%;"></div></div></td>
+                      <td><span class="lamp lamp-green"><span class="lamp-dot"></span>Güncel</span></td>
+                      <td style="font-size:12px;color:var(--text3);">—</td>
+                    </tr>
+                    <tr>
+                      <td><div class="person-cell"><div class="avatar" style="background:var(--blue-light);color:var(--blue-dark);">HÇ</div><div><div style="font-weight:500;">Hasan Çelik</div><div style="font-size:11px;color:var(--text3);">Güvenlik</div></div></div></td>
+                      <td><span class="badge badge-green">Grup 1</span></td>
+                      <td><span class="lamp lamp-green"><span class="lamp-dot"></span>Güncel</span></td>
+                      <td><div>8/8 saat</div><div class="progress-bar" style="margin-top:4px;width:100px;"><div class="progress-fill" style="width:100%;"></div></div></td>
+                      <td><span class="lamp lamp-green"><span class="lamp-dot"></span>Güncel</span></td>
+                      <td style="font-size:12px;color:var(--amber);font-weight:500;">Yüksekte Çalışamaz</td>
+                    </tr>
+                    <tr>
+                      <td><div class="person-cell"><div class="avatar" style="background:#F1EFE8;color:#444441;">ZA</div><div><div style="font-weight:500;">Zeynep Arslan</div><div style="font-size:11px;color:var(--text3);">Kalite Kontrol</div></div></div></td>
+                      <td><span class="badge badge-amber">Grup 2</span></td>
+                      <td><span class="lamp lamp-red"><span class="lamp-dot"></span>Eksik</span></td>
+                      <td><div>5/12 saat</div><div class="progress-bar" style="margin-top:4px;width:100px;"><div class="progress-fill" style="width:42%;background:var(--red);"></div></div></td>
+                      <td><span class="lamp lamp-amber"><span class="lamp-dot"></span>22 gün kaldı</span></td>
+                      <td style="font-size:12px;color:var(--blue);font-weight:500;">Gebe — 6 Ay Periyot</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="split-side">
+              <div class="panel">
+                <div class="panel-title">Lamba Göstergesi</div>
+                <div style="font-size:12px;color:var(--text2);line-height:2.4;">
+                  <div style="display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--green);display:inline-block;flex-shrink:0;"></span>Güncel — yasal süre içinde</div>
+                  <div style="display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--amber);display:inline-block;flex-shrink:0;"></span>Yaklaşıyor — 30 gün içinde doluyor</div>
+                  <div style="display:flex;align-items:center;gap:8px;"><span style="width:10px;height:10px;border-radius:50%;background:var(--red);display:inline-block;flex-shrink:0;"></span>Süresi geçmiş / eksik / yokluk</div>
+                </div>
+              </div>
+              <div class="panel">
+                <div class="panel-title">Toplam Uyum Skoru</div>
+                <div style="font-size:36px;font-weight:700;color:var(--green);line-height:1;">%76</div>
+                <div style="font-size:11px;color:var(--text3);margin-top:4px;">Hedef: %95</div>
+                <div class="mini-track" style="margin-top:8px;height:10px;border-radius:5px;">
+                  <div class="mini-fill" style="width:76%;background:var(--green);height:100%;border-radius:5px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MODULE: SAĞLIK & MUAYENE ══ -->
+      <div class="view" id="view-saglik">
+        <div class="split">
+          <div class="split-main">
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-header">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="var(--blue)"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6H9v-2h2V7h2v2h2v2h-2v6z"/></svg>
+                <span class="card-title">Muayene Formu — Yeni Kayıt</span>
+                <button class="btn primary" style="margin-left:auto;" onclick="openModal('modal-muayene')">+ Muayene Ekle</button>
+              </div>
+              <div class="card-body">
+                <div style="font-size:12px;color:var(--text3);margin-bottom:14px;">İşe giriş protokolü: Sağlık birimi, İK listesini beklemeden personel ekleyebilir. TCKN ile ilk Excel yüklemesinde otomatik birleştirilir.</div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Personel</th>
+                      <th>TC Kimlik</th>
+                      <th>Muayene Tarihi</th>
+                      <th>Periyot</th>
+                      <th>Sonraki Muayene</th>
+                      <th>Sonuç</th>
+                      <th>Kısıt</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><div style="font-weight:500;">Ahmet Yıldız</div></td>
+                      <td style="font-size:11px;color:var(--text3);">123 456 789 00</td>
+                      <td>10.03.2024</td>
+                      <td><span class="badge badge-red">1 Yıl</span></td>
+                      <td style="color:var(--red);font-weight:500;">10.03.2025 ⚠</td>
+                      <td><span class="lamp lamp-green"><span class="lamp-dot"></span>Çalışabilir</span></td>
+                      <td style="color:var(--text3);">—</td>
+                    </tr>
+                    <tr>
+                      <td><div style="font-weight:500;">Fatma Demir</div></td>
+                      <td style="font-size:11px;color:var(--text3);">234 567 890 11</td>
+                      <td>14.04.2024</td>
+                      <td><span class="badge badge-red">1 Yıl</span></td>
+                      <td style="color:var(--amber);font-weight:500;">14.04.2025 ⏰</td>
+                      <td><span class="lamp lamp-amber"><span class="lamp-dot"></span>Kısıtlı</span></td>
+                      <td style="color:var(--red);font-weight:500;font-size:12px;">Tek Çalışamaz</td>
+                    </tr>
+                    <tr>
+                      <td><div style="font-weight:500;">Zeynep Arslan</div></td>
+                      <td style="font-size:11px;color:var(--text3);">456 789 012 33</td>
+                      <td>01.02.2025</td>
+                      <td><span class="badge badge-amber">6 Ay (Gebe)</span></td>
+                      <td style="color:var(--amber);font-weight:500;">01.08.2025 ⏰</td>
+                      <td><span class="lamp lamp-amber"><span class="lamp-dot"></span>Kısıtlı</span></td>
+                      <td style="color:var(--blue);font-weight:500;font-size:12px;">Gece Çalışamaz</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="split-side">
+            <div class="panel">
+              <div class="panel-title">Gizlilik Notu</div>
+              <div style="font-size:12px;color:var(--text2);line-height:1.7;">
+                Tıbbi detaylar yalnızca <strong>Hekim</strong> ve <strong>Hemşire</strong> rolündeki kullanıcılar tarafından görülebilir. Diğer kullanıcılar yalnızca kısıt sonucunu görür.
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-title">Anlık Bildirim</div>
+              <div style="font-size:12px;color:var(--text2);line-height:1.8;">
+                Muayene kaydedildiği anda kısıtlar, ilgili firmanın mail grubuna otomatik gönderilir.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MODULE: EĞİTİM TAKİP ══ -->
+      <div class="view" id="view-egitim">
+        <div class="tabs-bar">
+          <div class="tab active" id="etab-yasal" onclick="switchEgitimTab('yasal')">İSG Eğitimleri (Yasal)</div>
+          <div class="tab" id="etab-diger" onclick="switchEgitimTab('diger')">Diğer Eğitimler (Arşiv)</div>
+          <div class="tab" id="etab-toplu" onclick="switchEgitimTab('toplu')">Toplu Giriş</div>
+        </div>
+
+        <div class="tab-view active" id="etabv-yasal">
+          <div class="card">
+            <div class="card-header">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="var(--green)"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
+              <span class="card-title">İSG Yasal Eğitim Takibi</span>
+              <button class="btn primary" style="margin-left:auto;" onclick="openModal('modal-egitim')">+ Eğitim Gir</button>
+            </div>
+            <div class="egitim-row header">
+              <span>Personel</span><span>Grup</span><span>Gerekli Saat</span><span>Tamamlanan</span><span>Kalan</span><span>Durum</span>
+            </div>
+            <div class="egitim-row">
+              <div><div style="font-weight:500;">Ahmet Yıldız</div><div style="font-size:11px;color:var(--text3);">ABC Metal</div></div>
+              <span><span class="badge badge-red">G3</span></span>
+              <span>16 saat/yıl</span>
+              <div><div>14 saat</div><div class="progress-bar" style="width:90px;"><div class="progress-fill" style="width:87%;"></div></div></div>
+              <span style="color:var(--amber);">2 saat</span>
+              <span><span class="lamp lamp-amber"><span class="lamp-dot"></span>Eksik</span></span>
+            </div>
+            <div class="egitim-row">
+              <div><div style="font-weight:500;">Fatma Demir</div><div style="font-size:11px;color:var(--text3);">ABC Metal</div></div>
+              <span><span class="badge badge-red">G3</span></span>
+              <span>16 saat/yıl</span>
+              <div><div>16 saat</div><div class="progress-bar" style="width:90px;"><div class="progress-fill" style="width:100%;"></div></div></div>
+              <span style="color:var(--green);">—</span>
+              <span><span class="lamp lamp-green"><span class="lamp-dot"></span>Tamamlandı</span></span>
+            </div>
+            <div class="egitim-row">
+              <div><div style="font-weight:500;">Mustafa Kaya</div><div style="font-size:11px;color:var(--text3);">ABC Metal</div></div>
+              <span><span class="badge badge-amber">G2</span></span>
+              <span>12 saat/2yıl</span>
+              <div><div>12 saat</div><div class="progress-bar" style="width:90px;"><div class="progress-fill" style="width:100%;"></div></div></div>
+              <span style="color:var(--green);">—</span>
+              <span><span class="lamp lamp-green"><span class="lamp-dot"></span>Tamamlandı</span></span>
+            </div>
+            <div class="egitim-row">
+              <div><div style="font-weight:500;">Zeynep Arslan</div><div style="font-size:11px;color:var(--text3);">ABC Metal</div></div>
+              <span><span class="badge badge-amber">G2</span></span>
+              <span>12 saat/2yıl</span>
+              <div><div>5 saat</div><div class="progress-bar" style="width:90px;"><div class="progress-fill" style="width:42%;background:var(--red);"></div></div></div>
+              <span style="color:var(--red);font-weight:600;">7 saat</span>
+              <span><span class="lamp lamp-red"><span class="lamp-dot"></span>Eksik</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-view" id="etabv-diger">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Diğer Eğitimler — Merkezi Arşiv</span>
+              <button class="btn primary" style="margin-left:auto;" onclick="openModal('modal-egitim')">+ Eğitim Ekle</button>
+            </div>
+            <div class="card-body">
+              <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Teknik ve mesleki eğitimler, yasal İSG saatini etkilemeden arşivlenir.</div>
+              <table>
+                <thead><tr><th>Personel</th><th>Eğitim Adı</th><th>Tür</th><th>Tarih</th><th>Süre</th></tr></thead>
+                <tbody>
+                  <tr><td style="font-weight:500;">Ahmet Yıldız</td><td>Vinç Operatörlüğü</td><td><span class="badge badge-blue">Mesleki</span></td><td>15.06.2024</td><td>8 saat</td></tr>
+                  <tr><td style="font-weight:500;">Hasan Çelik</td><td>Yangın Söndürme</td><td><span class="badge badge-amber">Teknik</span></td><td>20.09.2024</td><td>4 saat</td></tr>
+                  <tr><td style="font-weight:500;">Mustafa Kaya</td><td>İlk Yardım Sertifika</td><td><span class="badge badge-green">Sertifika</span></td><td>10.11.2024</td><td>16 saat</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-view" id="etabv-toplu">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Toplu Eğitim Girişi</span></div>
+            <div class="card-body">
+              <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">Tek işlemle birden fazla firmanın personeline aynı anda eğitim işlenebilir. Parçalı saat girişi desteklenir.</div>
+              <div class="form-grid">
+                <div class="form-field">
+                  <label>Eğitim Adı</label>
+                  <input placeholder="Örn: Yıllık İSG Temel Eğitimi" />
+                </div>
+                <div class="form-field">
+                  <label>Eğitim Tarihi</label>
+                  <input type="date" />
+                </div>
+                <div class="form-field">
+                  <label>Eğitim Süresi (Saat)</label>
+                  <input type="number" placeholder="0" min="0" step="0.5" />
+                </div>
+                <div class="form-field">
+                  <label>Eğitim Türü</label>
+                  <select>
+                    <option>İSG Yasal Eğitim</option>
+                    <option>Teknik Eğitim</option>
+                    <option>Mesleki Eğitim</option>
+                    <option>Sertifika Programı</option>
+                  </select>
+                </div>
+                <div class="form-field full-col">
+                  <label>Firma Seçimi (Birden Fazla Seçilebilir)</label>
+                  <select multiple style="height:80px;">
+                    <option>ABC Metal San. A.Ş.</option>
+                    <option>XYZ Lojistik Ltd. Şti.</option>
+                    <option>Demo Tekstil A.Ş.</option>
+                  </select>
+                </div>
+              </div>
+              <div style="margin-top:16px;">
+                <button class="btn primary" onclick="toast('Toplu eğitim kaydedildi. 247 personele işlendi ✓')">Tümüne Uygula</button>
+                <button class="btn" style="margin-left:8px;">Önizle</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ MODULE: RAPORLAR ══ -->
+      <div class="view" id="view-rapor">
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Haftalık Eksik Listesi</span></div>
+            <div class="card-body">
+              <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Her Pazartesi 09:00'da firmalara özel tablo halinde mail gönderilir.</div>
+              <button class="btn primary" onclick="toast('Haftalık rapor mail olarak gönderildi ✓')">Şimdi Gönder</button>
+              <button class="btn" style="margin-left:8px;" onclick="toast('Rapor önizleniyor…')">Önizle</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Yıl Sonu Analizi</span></div>
+            <div class="card-body">
+              <div style="font-size:12px;color:var(--text3);margin-bottom:12px;">Toplam eğitim saati ve tür dağılımı. Yıl sonu otomatik oluşturulur.</div>
+              <button class="btn primary" onclick="toast('Yıl sonu analizi PDF olarak hazırlandı ✓')">PDF İndir</button>
+              <button class="btn" style="margin-left:8px;" onclick="toast('Excel indiriliyor…')">Excel ↓</button>
+            </div>
+          </div>
+          <div class="card" style="grid-column:1/-1;">
+            <div class="card-header"><span class="card-title">Vade Takvimi</span></div>
+            <div class="card-body">
+              <table>
+                <thead><tr><th>Personel</th><th>Firma</th><th>Tür</th><th>Bitiş Tarihi</th><th>Kalan</th><th>Durum</th></tr></thead>
+                <tbody>
+                  <tr><td style="font-weight:500;">Ahmet Yıldız</td><td>ABC Metal</td><td>Muayene</td><td>10.03.2025</td><td style="color:var(--red);font-weight:600;">Geçti</td><td><span class="lamp lamp-red"><span class="lamp-dot"></span>Acil</span></td></tr>
+                  <tr><td style="font-weight:500;">Fatma Demir</td><td>ABC Metal</td><td>Eğitim</td><td>28.03.2025</td><td style="color:var(--amber);font-weight:600;">15 gün</td><td><span class="lamp lamp-amber"><span class="lamp-dot"></span>Uyarı</span></td></tr>
+                  <tr><td style="font-weight:500;">Zeynep Arslan</td><td>ABC Metal</td><td>Muayene</td><td>01.08.2025</td><td style="color:var(--green);">141 gün</td><td><span class="lamp lamp-green"><span class="lamp-dot"></span>Güncel</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Personel Ekle Modal -->
+<div class="modal-overlay" id="modal-personel">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Yeni Personel Ekle</h3>
+      <button class="modal-close" onclick="closeModal('modal-personel')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field"><label>Ad</label><input placeholder="Ad" /></div>
+        <div class="form-field"><label>Soyad</label><input placeholder="Soyad" /></div>
+        <div class="form-field"><label>TC Kimlik No</label><input placeholder="11 haneli TC" maxlength="11" /></div>
+        <div class="form-field"><label>Unvan / Görev</label><input placeholder="Makine Operatörü" /></div>
+        <div class="form-field"><label>İşe Giriş Tarihi</label><input type="date" /></div>
+        <div class="form-field"><label>Personel Grubu</label>
+          <select>
+            <option>Grup 3 — Çok Tehlikeli</option>
+            <option>Grup 2 — Tehlikeli</option>
+            <option>Grup 1 — Az Tehlikeli</option>
+          </select>
+        </div>
+        <div class="form-field full-col"><label>Özel Durum</label>
+          <select>
+            <option>Yok</option>
+            <option>Gebe (6 ay periyot)</option>
+            <option>Engelli</option>
+            <option>Diğer</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-personel')">İptal</button>
+      <button class="btn primary" onclick="addPersonel()">Personeli Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Excel Yükle Modal -->
+<div class="modal-overlay" id="modal-excel">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>İK Excel Yükle — Toplu Personel Güncellemesi</h3>
+      <button class="modal-close" onclick="closeModal('modal-excel')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="upload-zone" onclick="toast('Dosya seçici açıldı')">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11zM8 15h8v2H8zm0-4h8v2H8z"/></svg>
+        <div style="font-weight:500;color:var(--text);">Excel dosyasını buraya sürükleyin veya tıklayın</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:6px;">.xlsx, .xls desteklenir — Max 10MB</div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);margin-top:14px;padding:10px;background:var(--amber-light);border-radius:var(--radius-sm);color:var(--amber-dark);">
+        <strong>İK Senkronizasyonu:</strong> Excel'de olmayan mevcut aktif personeller otomatik <strong>Pasif</strong>'e çekilir ve İSG grubuna bildirim gönderilir.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-excel')">İptal</button>
+      <button class="btn primary" onclick="closeModal('modal-excel');toast('Excel başarıyla yüklendi. 247 kayıt senkronize edildi ✓')">Yükle ve Senkronize Et</button>
+    </div>
+  </div>
+</div>
+
+<!-- Muayene Modal -->
+<div class="modal-overlay" id="modal-muayene">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Muayene Kaydı Gir</h3>
+      <button class="modal-close" onclick="closeModal('modal-muayene')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid" style="margin-bottom:14px;">
+        <div class="form-field"><label>Personel (Ad Soyad / TC)</label><input placeholder="Ara veya TC gir..." /></div>
+        <div class="form-field"><label>Muayene Tarihi</label><input type="date" /></div>
+        <div class="form-field"><label>Muayene Türü</label>
+          <select><option>İşe Giriş</option><option>Periyodik</option><option>İşe Dönüş</option></select>
+        </div>
+        <div class="form-field"><label>Sonuç</label>
+          <select><option>Çalışabilir</option><option>Kısıtlı Çalışabilir</option><option>Çalışamaz</option></select>
+        </div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:8px;">Çalışma Koşulları Checklist</div>
+      <div class="checklist">
+        <label class="check-item"><input type="checkbox" checked onchange="toggleCheck(this)" /> Yüksekte çalışabilir</label>
+        <label class="check-item"><input type="checkbox" checked onchange="toggleCheck(this)" /> Gece vardiyasında çalışabilir</label>
+        <label class="check-item"><input type="checkbox" onchange="toggleCheck(this)" /> Tek başına çalışabilir</label>
+        <label class="check-item"><input type="checkbox" checked onchange="toggleCheck(this)" /> Ağır iş yükü kaldırabilir</label>
+        <label class="check-item"><input type="checkbox" onchange="toggleCheck(this)" /> Kimyasal ortamda çalışabilir</label>
+      </div>
+      <div class="form-field full-col" style="margin-top:12px;">
+        <label>Manuel Kısıt Notu (Yalnızca Hekim / Hemşire görebilir)</label>
+        <input placeholder="Örn: Sol diz protezi — merdiven kullanımı kısıtlı" />
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-muayene')">İptal</button>
+      <button class="btn primary" onclick="closeModal('modal-muayene');toast('Muayene kaydedildi. Kısıtlar mail grubuna bildirildi ✓')">Kaydet &amp; Bildir</button>
+    </div>
+  </div>
+</div>
+
+<!-- Eğitim Modal -->
+<div class="modal-overlay" id="modal-egitim">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Eğitim Kaydı Gir</h3>
+      <button class="modal-close" onclick="closeModal('modal-egitim')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field"><label>Eğitim Adı</label><input placeholder="İSG Temel Eğitimi" /></div>
+        <div class="form-field"><label>Tarih</label><input type="date" /></div>
+        <div class="form-field"><label>Süre (Saat)</label><input type="number" placeholder="0" min="0" step="0.5" /></div>
+        <div class="form-field"><label>Eğitim Türü</label>
+          <select>
+            <option>İSG Yasal Eğitim</option>
+            <option>Teknik Eğitim</option>
+            <option>Mesleki Eğitim</option>
+          </select>
+        </div>
+        <div class="form-field full-col"><label>Eğitime Katılan Personel</label>
+          <select multiple style="height:100px;">
+            <option>Ahmet Yıldız</option>
+            <option>Fatma Demir</option>
+            <option>Mustafa Kaya</option>
+            <option>Hasan Çelik</option>
+            <option>Zeynep Arslan</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-egitim')">İptal</button>
+      <button class="btn primary" onclick="closeModal('modal-egitim');toast('Eğitim kaydı başarıyla işlendi ✓')">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ── DATA ──
+const personelData = [
+  { id:1, ad:'Ahmet Yıldız',   tc:'123 456 789 00', unvan:'Makine Operatörü',   grup:'Grup 3', giris:'12.03.2022', durum:'Aktif',  renk:'#FCEBEB', textRenk:'#791F1F', init:'AY' },
+  { id:2, ad:'Fatma Demir',    tc:'234 567 890 11', unvan:'Kaynak Teknisyeni',  grup:'Grup 3', giris:'05.07.2021', durum:'Aktif',  renk:'#FAEEDA', textRenk:'#633806', init:'FD' },
+  { id:3, ad:'Mustafa Kaya',   tc:'345 678 901 22', unvan:'İdari Personel',     grup:'Grup 2', giris:'18.01.2023', durum:'Aktif',  renk:'#E1F5EE', textRenk:'#085041', init:'MK' },
+  { id:4, ad:'Zeynep Arslan',  tc:'456 789 012 33', unvan:'Kalite Kontrol',     grup:'Grup 2', giris:'22.09.2020', durum:'Pasif',  renk:'#F1EFE8', textRenk:'#444441', init:'ZA' },
+  { id:5, ad:'Hasan Çelik',    tc:'567 890 123 44', unvan:'Güvenlik Görevlisi', grup:'Grup 1', giris:'30.04.2024', durum:'Aktif',  renk:'#E6F1FB', textRenk:'#0C447C', init:'HÇ' },
+  { id:6, ad:'Selma Öztürk',   tc:'678 901 234 55', unvan:'Depo Sorumlusu',     grup:'Grup 3', giris:'14.08.2022', durum:'Aktif',  renk:'#FCEBEB', textRenk:'#791F1F', init:'SÖ' },
+];
+let filteredData = [...personelData];
+
+function renderTable(data) {
+  const tbody = document.getElementById('personel-tbody');
+  tbody.innerHTML = data.map(p => `
+    <tr>
+      <td><div class="person-cell">
+        <div class="avatar" style="background:${p.renk};color:${p.textRenk};">${p.init}</div>
+        <div><div style="font-weight:500;">${p.ad}</div><div style="font-size:11px;color:var(--text3);">${p.unvan}</div></div>
+      </div></td>
+      <td style="font-size:12px;color:var(--text3);">${p.tc}</td>
+      <td style="font-size:13px;">${p.unvan}</td>
+      <td><span class="badge ${p.grup==='Grup 3'?'badge-red':p.grup==='Grup 2'?'badge-amber':'badge-green'}">${p.grup}</span></td>
+      <td style="font-size:13px;">${p.giris}</td>
+      <td><span class="lamp ${p.durum==='Aktif'?'lamp-green':'lamp-amber'}"><span class="lamp-dot"></span>${p.durum}</span></td>
+      <td><button class="btn" style="font-size:11px;padding:4px 8px;" onclick="toast('${p.ad} düzenleniyor…')">Düzenle</button></td>
+    </tr>
+  `).join('');
+}
+
+function filterTable(val) {
+  const v = val.toLowerCase();
+  filteredData = personelData.filter(p => p.ad.toLowerCase().includes(v) || p.tc.includes(v) || p.unvan.toLowerCase().includes(v));
+  renderTable(filteredData);
+}
+
+function filterGrup(val) {
+  filteredData = val ? personelData.filter(p => p.grup === val) : [...personelData];
+  renderTable(filteredData);
+}
+
+function addPersonel() {
+  toast('Personel başarıyla eklendi ✓');
+  closeModal('modal-personel');
+}
+
+// ── NAVIGATION ──
+function switchModule(mod) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + mod).classList.add('active');
+
+  document.querySelectorAll('.nav-item[id^="nav-"]').forEach(n => n.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + mod);
+  if (navEl) navEl.classList.add('active');
+
+  const titles = { firma:'Firma ve Personel Yönetimi', saglik:'Sağlık ve Muayene Takibi', egitim:'Eğitim Takip', rapor:'Raporlar ve Analiz' };
+  document.getElementById('tb-title').textContent = titles[mod] || '';
+  document.getElementById('tb-breadcrumb').textContent = 'Firmalar /';
+
+  // Show/hide topbar buttons
+  const excelBtn = document.querySelector('.topbar .tb-right');
+  excelBtn.style.display = mod === 'firma' ? 'flex' : 'none';
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('#view-firma .tab-view').forEach(v => v.classList.remove('active'));
+  document.getElementById('tabv-' + tab).classList.add('active');
+  document.querySelectorAll('#view-firma .tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+
+  document.querySelectorAll('.nav-sub .nav-item').forEach(n => n.classList.remove('active'));
+  const sub = document.getElementById('subnav-' + tab);
+  if (sub) sub.classList.add('active');
+}
+
+function switchEgitimTab(tab) {
+  document.querySelectorAll('#view-egitim .tab-view').forEach(v => v.classList.remove('active'));
+  document.getElementById('etabv-' + tab).classList.add('active');
+  document.querySelectorAll('#view-egitim .tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('etab-' + tab).classList.add('active');
+}
+
+function changeFirma(val) {
+  const names = { all:'Tüm Firmalar', abc:'ABC Metal San. A.Ş.', xyz:'XYZ Lojistik Ltd. Şti.', demo:'Demo Tekstil A.Ş.' };
+  toast(names[val] + ' seçildi');
+}
+
+// ── PERIYOT LOGIC ──
+function updatePeriyot(val) {
+  const info = document.getElementById('periyot-info');
+  const g3tag = document.getElementById('g3-tavan');
+  const pg2 = document.getElementById('p-g2');
+  const pg1 = document.getElementById('p-g1');
+  if (val === 'cot' || val === 'cok') {
+    info.innerHTML = 'Bu firma <strong>Çok Tehlikeli</strong> sınıfında olduğundan, tüm personel gruplarına <strong>1 Yıl</strong> tavan süresi otomatik uygulanır.';
+    g3tag.style.display = 'block';
+    pg2.style.opacity = '.55'; pg1.style.opacity = '.55';
+  } else if (val === 'tehlikeli') {
+    info.innerHTML = 'Bu firma <strong>Tehlikeli</strong> sınıfında. Grup 1 personeline <strong>3 Yıl</strong> tavan uygulanır. Üst limitler korunur.';
+    g3tag.style.display = 'none';
+    pg2.style.opacity = '1'; pg1.style.opacity = '.55';
+  } else {
+    info.innerHTML = 'Bu firma <strong>Az Tehlikeli</strong> sınıfında. Personel kendi grubunun yasal periyodunu kullanabilir.';
+    g3tag.style.display = 'none';
+    pg2.style.opacity = '.55'; pg1.style.opacity = '1';
+  }
+}
+
+// ── MODAL ──
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+});
+
+// ── CHECKLIST ──
+function toggleCheck(el) { el.closest('.check-item').classList.toggle('checked', el.checked); }
+
+// ── TOAST ──
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── INIT ──
+renderTable(personelData);
+document.querySelectorAll('.check-item input:checked').forEach(el => el.closest('.check-item').classList.add('checked'));
+</script>
+</body>
+</html>
