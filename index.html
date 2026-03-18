@@ -1,225 +1,302 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>İSG Portal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --green:#1D9E75; --gl:#E1F5EE; --gd:#085041;
-      --amber:#BA7517; --al:#FAEEDA; --ad:#633806;
-      --red:#E24B4A;   --rl:#FCEBEB; --rd:#791F1F;
-      --blue:#185FA5;  --bl:#E6F1FB; --bd:#0C447C;
-      --bg:#F4F3F0; --sur:#FFFFFF; --sur2:#F8F7F4;
-      --bor:rgba(0,0,0,0.09); --bor2:rgba(0,0,0,0.15);
-      --tx:#1A1A18; --tx2:#5F5E5A; --tx3:#888780;
-      --r:10px; --rs:7px; --sw:256px;
-    }
-    html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--tx);font-size:14px;}
-    .app{display:flex;height:100vh;overflow:hidden;}
-    .sidebar{width:var(--sw);background:var(--sur);border-right:1px solid var(--bor);display:flex;flex-direction:column;flex-shrink:0;}
-    .logo{padding:16px;border-bottom:1px solid var(--bor);display:flex;align-items:center;gap:10px;}
-    .logo-icon{width:34px;height:34px;background:var(--green);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-    .logo-icon svg{width:18px;height:18px;fill:white;}
-    .logo-name{font-size:15px;font-weight:600;}
-    .logo-sub{font-size:10px;color:var(--tx3);}
-    .nav{padding:10px 8px;display:flex;flex-direction:column;gap:2px;}
-    .nav-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:var(--rs);cursor:pointer;font-size:13px;color:var(--tx2);transition:background .12s,color .12s;user-select:none;}
-    .nav-item:hover{background:var(--sur2);color:var(--tx);}
-    .nav-item.active{background:var(--gl);color:var(--gd);font-weight:600;}
-    .nav-item svg{width:16px;height:16px;flex-shrink:0;}
-    .nav-divider{height:1px;background:var(--bor);margin:4px 0;}
-    .nav-badge{margin-left:auto;font-size:10px;font-weight:600;padding:2px 7px;border-radius:99px;background:var(--rl);color:var(--rd);}
-    .sidebar-footer{margin-top:auto;padding:14px;border-top:1px solid var(--bor);}
-    .sidebar-footer div{font-size:11px;color:var(--tx3);line-height:1.9;}
-    .main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
-    .topbar{height:56px;background:var(--sur);border-bottom:1px solid var(--bor);display:flex;align-items:center;padding:0 22px;gap:8px;flex-shrink:0;}
-    .tb-back{width:30px;height:30px;border:1px solid var(--bor2);border-radius:var(--rs);display:none;align-items:center;justify-content:center;cursor:pointer;color:var(--tx2);background:var(--sur);}
-    .tb-back:hover{background:var(--sur2);}
-    .tb-back.show{display:flex;}
-    .tb-crumb{font-size:12px;color:var(--tx3);}
-    .tb-title{font-size:15px;font-weight:600;}
-    .tb-right{margin-left:auto;display:flex;gap:8px;}
-    .btn{padding:7px 14px;border:1px solid var(--bor2);border-radius:var(--rs);font-size:12px;font-family:inherit;cursor:pointer;background:var(--sur);color:var(--tx);display:inline-flex;align-items:center;gap:6px;transition:background .12s;white-space:nowrap;}
-    .btn:hover{background:var(--sur2);}
-    .btn.primary{background:var(--green);color:white;border-color:var(--green);font-weight:500;}
-    .btn.primary:hover{background:#189060;}
-    .btn.sm{padding:5px 10px;font-size:11px;}
-    .content{flex:1;overflow-y:auto;padding:22px;}
-    .stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px;}
-    .stat-card{background:var(--sur);border:1px solid var(--bor);border-radius:var(--r);padding:14px 16px;}
-    .stat-label{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px;}
-    .stat-val{font-size:26px;font-weight:700;line-height:1;}
-    .stat-sub{font-size:11px;color:var(--tx3);margin-top:4px;}
-    .card{background:var(--sur);border:1px solid var(--bor);border-radius:var(--r);overflow:hidden;margin-bottom:16px;}
-    .card-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--bor);}
-    .card-title{font-size:13px;font-weight:600;}
-    .card-body{padding:16px;}
-    .tbar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--bor);flex-wrap:wrap;}
-    .inp{padding:7px 10px;border:1px solid var(--bor2);border-radius:var(--rs);font-size:12px;font-family:inherit;background:var(--sur2);color:var(--tx);}
-    .inp:focus{outline:2px solid var(--green);}
-    .sel{padding:7px 10px;border:1px solid var(--bor2);border-radius:var(--rs);font-size:12px;font-family:inherit;background:var(--sur2);color:var(--tx);cursor:pointer;}
-    table{width:100%;border-collapse:collapse;font-size:13px;}
-    thead th{padding:9px 14px;text-align:left;font-size:10px;font-weight:600;color:var(--tx3);background:var(--sur2);border-bottom:1px solid var(--bor);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;}
-    tbody td{padding:11px 14px;border-bottom:1px solid var(--bor);vertical-align:middle;}
-    tbody tr:last-child td{border-bottom:none;}
-    tbody tr:hover td{background:#FAFAF8;}
-    .lamp{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 8px;border-radius:99px;font-weight:500;white-space:nowrap;}
-    .lamp-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-    .lg{background:var(--gl);color:var(--gd);} .lg .lamp-dot{background:var(--green);}
-    .la{background:var(--al);color:var(--ad);} .la .lamp-dot{background:var(--amber);}
-    .lr{background:var(--rl);color:var(--rd);} .lr .lamp-dot{background:var(--red);}
-    .badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;}
-    .bg-r{background:var(--rl);color:var(--rd);}
-    .bg-a{background:var(--al);color:var(--ad);}
-    .bg-g{background:var(--gl);color:var(--gd);}
-    .bg-b{background:var(--bl);color:var(--bd);}
-    .person{display:flex;align-items:center;gap:9px;}
-    .avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
-    .tabs{display:flex;gap:2px;background:var(--sur2);padding:3px;border-radius:var(--rs);width:fit-content;margin-bottom:16px;border:1px solid var(--bor);}
-    .tab{padding:6px 15px;border-radius:6px;font-size:13px;cursor:pointer;color:var(--tx2);user-select:none;}
-    .tab:hover{background:rgba(255,255,255,.6);}
-    .tab.active{background:var(--sur);color:var(--tx);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08);}
-    .split{display:flex;gap:16px;align-items:flex-start;}
-    .split-main{flex:1;min-width:0;}
-    .split-side{width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;}
-    .panel{background:var(--sur);border:1px solid var(--bor);border-radius:var(--r);padding:14px;}
-    .panel-title{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;}
-    .mini-bar{margin-bottom:9px;}
-    .mini-row{display:flex;justify-content:space-between;font-size:11px;color:var(--tx2);margin-bottom:3px;}
-    .mini-track{height:6px;background:var(--sur2);border-radius:3px;overflow:hidden;border:1px solid var(--bor);}
-    .mini-fill{height:100%;border-radius:3px;}
-    .alert-row{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--bor);font-size:11px;color:var(--tx2);line-height:1.4;}
-    .alert-row:last-child{border-bottom:none;}
-    .alert-dot{width:7px;height:7px;border-radius:50%;margin-top:3px;flex-shrink:0;}
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-    .ff{display:flex;flex-direction:column;gap:4px;}
-    .ff label{font-size:11px;font-weight:600;color:var(--tx3);}
-    .ff input,.ff select{padding:8px 10px;border:1px solid var(--bor2);border-radius:var(--rs);font-size:13px;font-family:inherit;background:var(--sur2);color:var(--tx);}
-    .ff input:focus,.ff select:focus{outline:2px solid var(--green);}
-    .fc{grid-column:1/-1;}
-    .prog-wrap{display:flex;align-items:center;gap:8px;}
-    .prog-bar{flex:1;height:7px;background:var(--sur2);border-radius:4px;overflow:hidden;border:1px solid var(--bor);}
-    .prog-fill{height:100%;border-radius:4px;background:var(--green);}
-    .prog-fill.warn{background:var(--amber);}
-    .prog-fill.danger{background:var(--red);}
-    .periyot-boxes{display:flex;gap:8px;margin-top:14px;}
-    .pbox{flex:1;border-radius:var(--rs);padding:12px;}
-    .check-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--bor);border-radius:var(--rs);cursor:pointer;font-size:13px;margin-bottom:6px;}
-    .check-item:hover{background:var(--sur2);}
-    .check-item.checked{background:var(--gl);border-color:rgba(29,158,117,.3);}
-    .check-item input{width:15px;height:15px;accent-color:var(--green);}
-    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.38);z-index:200;align-items:center;justify-content:center;}
-    .overlay.open{display:flex;}
-    .modal{background:var(--sur);border-radius:var(--r);width:500px;max-width:95vw;max-height:88vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.2);}
-    .modal-head{display:flex;align-items:center;padding:14px 18px;border-bottom:1px solid var(--bor);}
-    .modal-head h3{font-size:14px;font-weight:600;flex:1;}
-    .modal-x{width:26px;height:26px;border:none;background:none;cursor:pointer;font-size:16px;color:var(--tx3);border-radius:5px;}
-    .modal-x:hover{background:var(--sur2);}
-    .modal-body{padding:18px;}
-    .modal-foot{padding:12px 18px;border-top:1px solid var(--bor);display:flex;justify-content:flex-end;gap:8px;}
-    .upload-zone{border:2px dashed var(--bor2);border-radius:var(--r);padding:28px;text-align:center;cursor:pointer;}
-    .upload-zone:hover{border-color:var(--green);background:var(--gl);}
-    .upload-zone svg{width:32px;height:32px;margin:0 auto 8px;display:block;fill:var(--tx3);}
-    #toast{position:fixed;bottom:22px;right:22px;background:#1A1A18;color:#fff;padding:10px 16px;border-radius:var(--rs);font-size:12px;z-index:999;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;}
-    #toast.show{opacity:1;transform:translateY(0);}
-    .view{display:none;} .view.active{display:block;}
-    .tabv{display:none;} .tabv.active{display:block;}
-    @media(max-width:900px){.stat-grid{grid-template-columns:repeat(2,1fr);}.split{flex-direction:column;}.split-side{width:100%;}}
-    @media(max-width:640px){.sidebar{display:none;}}
-  </style>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>İSG Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --gr:#1D9E75;--gl:#E1F5EE;--gd:#085041;
+  --am:#BA7517;--al:#FAEEDA;--ad:#633806;
+  --re:#E24B4A;--rl:#FCEBEB;--rd:#791F1F;
+  --bl:#185FA5;--bll:#E6F1FB;--bd:#0C447C;
+  --pu:#534AB7;--pl:#EEEDFE;--pd:#26215C;
+  --bg:#F4F3F0;--s:#fff;--s2:#F8F7F4;
+  --bo:rgba(0,0,0,.09);--bo2:rgba(0,0,0,.15);
+  --t:#1A1A18;--t2:#5F5E5A;--t3:#888780;
+  --r:10px;--rs:7px;--sw:250px;
+}
+html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--t);font-size:14px;}
+.app{display:flex;height:100vh;overflow:hidden;}
+
+/* SIDEBAR */
+.sb{width:var(--sw);background:var(--s);border-right:1px solid var(--bo);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.sb-logo{padding:14px;border-bottom:1px solid var(--bo);display:flex;align-items:center;gap:10px;}
+.sb-ic{width:33px;height:33px;background:var(--gr);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sb-ic svg{width:17px;height:17px;fill:#fff;}
+.sb-nm{font-size:14px;font-weight:600;}
+.sb-sb{font-size:10px;color:var(--t3);}
+.sb-nav{padding:8px;flex:1;}
+.sb-sec{font-size:9px;font-weight:700;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;padding:10px 8px 4px;}
+.ni{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rs);cursor:pointer;font-size:13px;color:var(--t2);transition:background .1s,color .1s;user-select:none;margin-bottom:1px;}
+.ni:hover{background:var(--s2);color:var(--t);}
+.ni.active{background:var(--gl);color:var(--gd);font-weight:600;}
+.ni svg{width:15px;height:15px;flex-shrink:0;}
+.ni-b{margin-left:auto;font-size:10px;font-weight:700;padding:2px 6px;border-radius:99px;}
+.ndiv{height:1px;background:var(--bo);margin:4px 2px;}
+.sb-ft{padding:11px 13px;border-top:1px solid var(--bo);}
+.sb-ft div{font-size:11px;color:var(--t3);line-height:2;}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
+.topbar{height:52px;background:var(--s);border-bottom:1px solid var(--bo);display:flex;align-items:center;padding:0 18px;gap:7px;flex-shrink:0;}
+.tb-bk{width:28px;height:28px;border:1px solid var(--bo2);border-radius:var(--rs);display:none;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);background:var(--s);}
+.tb-bk:hover{background:var(--s2);}
+.tb-bk.show{display:flex;}
+.tb-cr{font-size:12px;color:var(--t3);}
+.tb-sp{font-size:12px;color:var(--bo2);margin:0 2px;}
+.tb-ti{font-size:14px;font-weight:600;}
+.tb-rt{margin-left:auto;display:flex;gap:6px;align-items:center;}
+
+/* CONTENT */
+.cnt{flex:1;overflow-y:auto;padding:18px;}
+
+/* BUTTONS */
+.btn{padding:6px 12px;border:1px solid var(--bo2);border-radius:var(--rs);font-size:12px;font-family:inherit;cursor:pointer;background:var(--s);color:var(--t);display:inline-flex;align-items:center;gap:5px;transition:background .1s;white-space:nowrap;}
+.btn:hover{background:var(--s2);}
+.btn.pr{background:var(--gr);color:#fff;border-color:var(--gr);font-weight:500;}
+.btn.pr:hover{background:#189060;}
+.btn.dg{background:var(--rl);color:var(--rd);border-color:rgba(226,75,74,.3);}
+.btn.sm{padding:5px 9px;font-size:11px;}
+.btn.xs{padding:3px 7px;font-size:10px;}
+
+/* STATS */
+.sgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin-bottom:16px;}
+.sc{background:var(--s);border:1px solid var(--bo);border-radius:var(--r);padding:13px 15px;}
+.sc-l{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.sc-v{font-size:25px;font-weight:700;line-height:1;}
+.sc-s{font-size:11px;color:var(--t3);margin-top:4px;}
+
+/* CARD */
+.card{background:var(--s);border:1px solid var(--bo);border-radius:var(--r);overflow:hidden;margin-bottom:13px;}
+.ch{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--bo);}
+.ct{font-size:13px;font-weight:600;}
+.cb{padding:14px;}
+
+/* TABLE */
+.tbar{display:flex;align-items:center;gap:7px;padding:9px 12px;border-bottom:1px solid var(--bo);flex-wrap:wrap;}
+.inp{padding:6px 9px;border:1px solid var(--bo2);border-radius:var(--rs);font-size:12px;font-family:inherit;background:var(--s2);color:var(--t);}
+.inp:focus{outline:2px solid var(--gr);}
+.sel{padding:6px 8px;border:1px solid var(--bo2);border-radius:var(--rs);font-size:12px;font-family:inherit;background:var(--s2);color:var(--t);cursor:pointer;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{padding:8px 12px;text-align:left;font-size:10px;font-weight:700;color:var(--t3);background:var(--s2);border-bottom:1px solid var(--bo);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--bo);vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:#FAFAF8;}
+
+/* LAMP */
+.lamp{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:3px 8px;border-radius:99px;font-weight:500;white-space:nowrap;}
+.ld{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.lg{background:var(--gl);color:var(--gd);}.lg .ld{background:var(--gr);}
+.la{background:var(--al);color:var(--ad);}.la .ld{background:var(--am);}
+.lr{background:var(--rl);color:var(--rd);}.lr .ld{background:var(--re);}
+
+/* BADGE */
+.bdg{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;}
+.br{background:var(--rl);color:var(--rd);}
+.ba{background:var(--al);color:var(--ad);}
+.bg{background:var(--gl);color:var(--gd);}
+.bb{background:var(--bll);color:var(--bd);}
+.bp{background:var(--pl);color:var(--pd);}
+
+/* PERSON */
+.person{display:flex;align-items:center;gap:8px;}
+.av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+
+/* TABS */
+.tabs{display:flex;gap:2px;background:var(--s2);padding:3px;border-radius:var(--rs);width:fit-content;margin-bottom:14px;border:1px solid var(--bo);}
+.tab{padding:6px 13px;border-radius:6px;font-size:13px;cursor:pointer;color:var(--t2);user-select:none;}
+.tab:hover{background:rgba(255,255,255,.6);}
+.tab.active{background:var(--s);color:var(--t);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08);}
+
+/* SPLIT */
+.split{display:flex;gap:13px;align-items:flex-start;}
+.sm2{flex:1;min-width:0;}
+.ss{width:212px;flex-shrink:0;display:flex;flex-direction:column;gap:10px;}
+.panel{background:var(--s);border:1px solid var(--bo);border-radius:var(--r);padding:12px;}
+.pt{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;}
+.mb{margin-bottom:8px;}
+.mr{display:flex;justify-content:space-between;font-size:11px;color:var(--t2);margin-bottom:3px;}
+.mtr{height:5px;background:var(--s2);border-radius:3px;overflow:hidden;border:1px solid var(--bo);}
+.mf{height:100%;border-radius:3px;}
+.ar{display:flex;gap:7px;padding:5px 0;border-bottom:1px solid var(--bo);font-size:11px;color:var(--t2);line-height:1.4;}
+.ar:last-child{border-bottom:none;}
+.ad{width:7px;height:7px;border-radius:50%;margin-top:3px;flex-shrink:0;}
+
+/* FORM */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.ff{display:flex;flex-direction:column;gap:4px;}
+.ff label{font-size:11px;font-weight:600;color:var(--t3);}
+.ff input,.ff select,.ff textarea{padding:7px 9px;border:1px solid var(--bo2);border-radius:var(--rs);font-size:13px;font-family:inherit;background:var(--s2);color:var(--t);}
+.ff input:focus,.ff select:focus,.ff textarea:focus{outline:2px solid var(--gr);}
+.fc{grid-column:1/-1;}
+
+/* PROGRESS */
+.pw{display:flex;align-items:center;gap:7px;}
+.pb{flex:1;height:6px;background:var(--s2);border-radius:4px;overflow:hidden;border:1px solid var(--bo);}
+.pf{height:100%;border-radius:4px;background:var(--gr);}
+.pf.w{background:var(--am);}
+.pf.d{background:var(--re);}
+
+/* PERIYOT */
+.pboxes{display:flex;gap:7px;margin-top:11px;}
+.pbox{flex:1;border-radius:var(--rs);padding:10px;}
+
+/* CHECKLIST */
+.chk{display:flex;align-items:center;gap:9px;padding:7px 10px;border:1px solid var(--bo);border-radius:var(--rs);cursor:pointer;font-size:13px;margin-bottom:5px;}
+.chk:hover{background:var(--s2);}
+.chk.checked{background:var(--gl);border-color:rgba(29,158,117,.3);}
+.chk input{width:14px;height:14px;accent-color:var(--gr);}
+
+/* MODAL */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;align-items:center;justify-content:center;}
+.ov.open{display:flex;}
+.modal{background:var(--s);border-radius:var(--r);width:520px;max-width:96vw;max-height:90vh;overflow-y:auto;box-shadow:0 10px 50px rgba(0,0,0,.22);}
+.modal.wd{width:680px;}
+.mh{display:flex;align-items:center;padding:13px 17px;border-bottom:1px solid var(--bo);}
+.mh h3{font-size:14px;font-weight:600;flex:1;}
+.mx{width:26px;height:26px;border:none;background:none;cursor:pointer;font-size:17px;color:var(--t3);border-radius:5px;}
+.mx:hover{background:var(--s2);}
+.mbody{padding:16px;}
+.mft{padding:11px 17px;border-top:1px solid var(--bo);display:flex;justify-content:flex-end;gap:7px;}
+
+/* CONFIRM */
+.cfm{background:var(--s);border-radius:var(--r);width:440px;max-width:95vw;box-shadow:0 10px 50px rgba(0,0,0,.22);padding:22px;}
+.cfm h3{font-size:15px;font-weight:600;margin-bottom:9px;}
+.cfm p{font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:8px;}
+.cfm-act{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+
+/* UPLOAD */
+.upz{border:2px dashed var(--bo2);border-radius:var(--r);padding:24px;text-align:center;cursor:pointer;}
+.upz:hover{border-color:var(--gr);background:var(--gl);}
+.upz svg{width:28px;height:28px;margin:0 auto 7px;display:block;fill:var(--t3);}
+
+/* KPI */
+.kgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin-bottom:14px;}
+.kc{background:var(--s);border:1px solid var(--bo);border-radius:var(--r);padding:15px;}
+.kv{font-size:30px;font-weight:700;line-height:1;margin-bottom:3px;}
+.kl{font-size:12px;color:var(--t2);}
+.ks{font-size:11px;color:var(--t3);margin-top:5px;}
+
+/* İSG EVRAKLARI */
+.evrak-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;}
+.evrak-card{background:var(--s);border:1px solid var(--bo);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:8px;}
+.evrak-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;}
+.evrak-name{font-size:13px;font-weight:500;}
+.evrak-sub{font-size:11px;color:var(--t3);}
+
+/* INFO BOX */
+.ib{font-size:12px;border-radius:var(--rs);padding:9px 11px;line-height:1.6;margin-top:7px;}
+
+/* TOAST */
+#toast{position:fixed;bottom:18px;right:18px;background:#1A1A18;color:#fff;padding:9px 15px;border-radius:var(--rs);font-size:12px;z-index:999;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;max-width:320px;}
+#toast.show{opacity:1;transform:translateY(0);}
+
+.view{display:none;}.view.active{display:block;}
+.tabv{display:none;}.tabv.active{display:block;}
+
+@media(max-width:900px){.sgrid{grid-template-columns:repeat(2,1fr);}.split{flex-direction:column;}.ss{width:100%;}.kgrid{grid-template-columns:repeat(2,1fr);}.evrak-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:640px){.sb{display:none;}}
+</style>
 </head>
 <body>
 <div class="app">
 
-<aside class="sidebar">
-  <div class="logo">
-    <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.5 8 4.3v6.4l-8 4-8-4V8.8l8-4.3z"/></svg></div>
-    <div><div class="logo-name">İSG Portal</div><div class="logo-sub">İş Sağlığı ve Güvenliği</div></div>
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sb">
+  <div class="sb-logo">
+    <div class="sb-ic"><svg viewBox="0 0 24 24"><path d="M12 2L2 7v10l10 5 10-5V7L12 2zm0 2.6 7.5 4v6.8l-7.5 3.8-7.5-3.8V8.6l7.5-4z"/></svg></div>
+    <div><div class="sb-nm">İSG Portal</div><div class="sb-sb">İş Sağlığı ve Güvenliği</div></div>
   </div>
-  <div class="nav">
-    <div class="nav-item active" id="snav-firmalar" onclick="goModule('firmalar')">
+  <div class="sb-nav">
+    <div class="sb-sec">Hizmet Sağlayan Firmalar</div>
+    <div class="ni active" id="snav-firmalar" onclick="goModule('firmalar')">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/></svg>
       Firmalar
     </div>
-    <div class="nav-divider"></div>
-    <div class="nav-item" id="snav-egitim" onclick="goModule('egitim')">
+    <div class="ndiv"></div>
+    <div class="ni" id="snav-egitim" onclick="goModule('egitim')">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zm-7 9.18V16l7 3.82 7-3.82v-3.82L12 16l-7-3.82z"/></svg>
       Eğitim
-      <span class="nav-badge">3</span>
+      <span class="ni-b" style="background:var(--rl);color:var(--rd);" id="egitim-badge">3</span>
     </div>
-    <div class="nav-divider"></div>
-    <div class="nav-item" id="snav-saglik" onclick="goModule('saglik')">
+    <div class="ndiv"></div>
+    <div class="ni" id="snav-saglik" onclick="goModule('saglik')">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6H9v-2h2V7h2v2h2v2h-2v6z"/></svg>
       Sağlık
-      <span class="nav-badge" style="background:var(--al);color:var(--ad);">5</span>
+      <span class="ni-b" style="background:var(--al);color:var(--ad);" id="saglik-badge">5</span>
+    </div>
+    <div class="ndiv"></div>
+    <div class="ni" id="snav-kpi" onclick="goModule('kpi')">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      KPI
     </div>
   </div>
-  <div class="sidebar-footer">
-    <div>📅 Pzt 09:00 — Haftalık rapor</div>
+  <div class="sb-ft">
+    <div>📅 Her gün 09:00 — eksik listesi maili</div>
     <div>⏰ 30 gün kala vade uyarısı</div>
     <div>🔄 İK senkronizasyonu aktif</div>
   </div>
 </aside>
 
+<!-- ═══ MAIN ═══ -->
 <div class="main">
   <div class="topbar">
-    <div class="tb-back" id="tb-back" onclick="goBack()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+    <div class="tb-bk" id="tb-back" onclick="goBack()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
     </div>
-    <span class="tb-crumb" id="tb-crumb"></span>
-    <span class="tb-title" id="tb-title">Firmalar</span>
-    <div class="tb-right" id="tb-right"></div>
+    <span class="tb-cr" id="tb-crumb"></span>
+    <span class="tb-sp" id="tb-sep" style="display:none;">/</span>
+    <span class="tb-ti" id="tb-title">Firmalar</span>
+    <div class="tb-rt" id="tb-right"></div>
   </div>
 
-  <div class="content">
+  <div class="cnt">
 
-    <!-- ██ FIRMALAR LİSTESİ ██ -->
+    <!-- ████ FİRMALAR LİSTESİ ████ -->
     <div class="view active" id="view-firmalar">
-      <div class="stat-grid">
-        <div class="stat-card"><div class="stat-label">Toplam Firma</div><div class="stat-val">3</div><div class="stat-sub">Aktif sözleşme</div></div>
-        <div class="stat-card"><div class="stat-label">Toplam Personel</div><div class="stat-val">247</div><div class="stat-sub">3 firmada</div></div>
-        <div class="stat-card"><div class="stat-label">Süresi Geçmiş</div><div class="stat-val" style="color:var(--red)">24</div><div class="stat-sub">Eğitim veya muayene</div></div>
-        <div class="stat-card"><div class="stat-label">30 Gün İçinde</div><div class="stat-val" style="color:var(--amber)">34</div><div class="stat-sub">Vade yaklaşıyor</div></div>
+      <div class="sgrid">
+        <div class="sc"><div class="sc-l">Toplam Firma</div><div class="sc-v">4</div><div class="sc-s">Aktif sözleşme</div></div>
+        <div class="sc"><div class="sc-l">Toplam Personel</div><div class="sc-v">597</div><div class="sc-s">4 firmada</div></div>
+        <div class="sc"><div class="sc-l">Eğitim Eksik</div><div class="sc-v" style="color:var(--re)">38</div><div class="sc-s">Acil aksiyon</div></div>
+        <div class="sc"><div class="sc-l">Muayene Eksik</div><div class="sc-v" style="color:var(--am)">24</div><div class="sc-s">İşlem gerekli</div></div>
       </div>
       <div class="card">
-        <div class="card-head">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="var(--green)"><path d="M12 7V3H2v18h20V7H12z"/></svg>
-          <span class="card-title">Tüm Firmalar</span>
-          <div style="margin-left:auto;display:flex;gap:8px;">
-            <input class="inp" placeholder="Firma ara…" style="width:190px;" oninput="filterFirma(this.value)" />
-            <button class="btn primary" onclick="openModal('modal-firma-ekle')">+ Firma Ekle</button>
+        <div class="ch">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="var(--gr)"><path d="M12 7V3H2v18h20V7H12z"/></svg>
+          <span class="ct">Hizmet Sağlayan Firmalar</span>
+          <div style="margin-left:auto;display:flex;gap:6px;">
+            <input class="inp" placeholder="Firma ara…" style="width:170px;" oninput="filterFirma(this.value)"/>
+            <button class="btn pr sm" onclick="openM('m-firma-ekle')">+ Firma Ekle</button>
           </div>
         </div>
         <table>
-          <thead><tr><th>Firma Adı</th><th>Tehlike Sınıfı</th><th>Çalışan</th><th>Eğitim Durumu</th><th>Muayene Durumu</th><th>İşlem</th></tr></thead>
+          <thead><tr><th style="width:36px;">No</th><th>Firma Adı</th><th>Tehlike Sınıfı</th><th>Çalışan Sayısı</th><th>Eğitim Eksik</th><th>Muayene Eksik</th><th>İşlem</th></tr></thead>
           <tbody id="firma-tbody"></tbody>
         </table>
       </div>
     </div>
 
-    <!-- ██ FİRMA DETAY ██ -->
-    <div class="view" id="view-firma-detay">
+    <!-- ████ FİRMA DETAY ████ -->
+    <div class="view" id="view-detay">
       <div class="tabs">
-        <div class="tab active" id="dtab-bilgi"    onclick="switchDetay('bilgi')">Firma Bilgileri</div>
-        <div class="tab"        id="dtab-personel" onclick="switchDetay('personel')">Personel Listesi</div>
-        <div class="tab"        id="dtab-durum"    onclick="switchDetay('durum')">Eğitim &amp; Muayene</div>
+        <div class="tab active" id="dtab-bilgi"    onclick="sd('bilgi')">Firma Bilgileri</div>
+        <div class="tab"        id="dtab-personel" onclick="sd('personel')">Personel Listesi</div>
+        <div class="tab"        id="dtab-durum"    onclick="sd('durum')">Eğitim &amp; Muayene</div>
+        <div class="tab"        id="dtab-evrak"    onclick="sd('evrak')">İSG Evrakları</div>
+        <div class="tab"        id="dtab-kpi"      onclick="sd('kpi')">KPI</div>
       </div>
 
-      <!-- TAB: BİLGİ -->
+      <!-- TAB: FİRMA BİLGİLERİ -->
       <div class="tabv active" id="dtabv-bilgi">
         <div class="split">
-          <div class="split-main">
+          <div class="sm2">
             <div class="card">
-              <div class="card-head">
-                <span class="card-title" id="detay-firma-adi">—</span>
-                <button class="btn sm" style="margin-left:auto;" onclick="toast('Firma bilgileri güncellendi ✓')">Kaydet</button>
-              </div>
-              <div class="card-body">
-                <div class="form-grid">
-                  <div class="ff"><label>Firma Adı</label><input id="df-adi" /></div>
+              <div class="ch"><span class="ct" id="d-firma-adi">—</span><button class="btn sm" style="margin-left:auto;" onclick="toast('Firma bilgileri kaydedildi ✓')">💾 Kaydet</button></div>
+              <div class="cb">
+                <div class="fg">
+                  <div class="ff"><label>Firma Adı</label><input id="df-adi"/></div>
                   <div class="ff"><label>Tehlike Sınıfı</label>
                     <select id="df-sinif" onchange="updatePeriyot(this.value)">
                       <option value="cok">Çok Tehlikeli</option>
@@ -227,510 +304,783 @@
                       <option value="az">Az Tehlikeli</option>
                     </select>
                   </div>
-                  <div class="ff"><label>İş Kolu / Faaliyet</label><input id="df-iskolu" /></div>
-                  <div class="ff"><label>NACE Kodu</label><input id="df-nace" /></div>
-                  <div class="ff fc"><label>Bildirim Mail Grubu (virgülle ayırın)</label><input id="df-mail" /></div>
+                  <div class="ff"><label>İş Kolu / Faaliyet</label><input id="df-iskolu"/></div>
+                  <div class="ff"><label>NACE Kodu</label><input id="df-nace"/></div>
+                  <div class="ff fc"><label>Bildirim Mail Grubu (virgülle ayırın)</label><input id="df-mail"/></div>
                 </div>
-                <div style="margin-top:18px;">
-                  <div style="font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">⚡ Üst Limit Kilidi — Otomatik Yasal Periyot</div>
-                  <div class="periyot-boxes">
+                <div style="margin-top:14px;">
+                  <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;">⚡ Üst Limit Kilidi — Yasal Periyot Algoritması</div>
+                  <div class="pboxes">
                     <div class="pbox" style="background:var(--rl);border:1px solid rgba(226,75,74,.2);">
-                      <div style="font-size:10px;font-weight:700;color:var(--rd);text-transform:uppercase;">Grup 3 · Çok Tehlikeli</div>
-                      <div style="font-size:20px;font-weight:700;color:var(--rd);margin:3px 0;">1 Yıl</div>
-                      <div style="font-size:11px;color:var(--red);">Muayene · 16 saat/yıl</div>
-                      <div id="g3-tavan" style="font-size:10px;color:var(--rd);margin-top:4px;font-weight:600;">← Aktif Tavan</div>
+                      <div style="font-size:9px;font-weight:700;color:var(--rd);text-transform:uppercase;">Grup 3 · Çok Tehlikeli</div>
+                      <div style="font-size:19px;font-weight:700;color:var(--rd);margin:3px 0;">1 Yıl</div>
+                      <div style="font-size:11px;color:var(--re);">Muayene · 16 saat/yıl</div>
+                      <div id="g3-tavan" style="font-size:10px;color:var(--rd);margin-top:3px;font-weight:700;">← Aktif Tavan</div>
                     </div>
-                    <div class="pbox" id="p-g2" style="background:var(--al);border:1px solid rgba(186,117,23,.2);opacity:.5;">
-                      <div style="font-size:10px;font-weight:700;color:var(--ad);text-transform:uppercase;">Grup 2 · Tehlikeli</div>
-                      <div style="font-size:20px;font-weight:700;color:var(--ad);margin:3px 0;">3 Yıl</div>
-                      <div style="font-size:11px;color:var(--amber);">Muayene · 12 saat/2yıl</div>
+                    <div class="pbox" id="p-g2" style="background:var(--al);border:1px solid rgba(186,117,23,.2);">
+                      <div style="font-size:9px;font-weight:700;color:var(--ad);text-transform:uppercase;">Grup 2 · Tehlikeli</div>
+                      <div style="font-size:19px;font-weight:700;color:var(--ad);margin:3px 0;">3 Yıl</div>
+                      <div style="font-size:11px;color:var(--am);">Muayene · 12 saat/2yıl</div>
                     </div>
-                    <div class="pbox" id="p-g1" style="background:var(--gl);border:1px solid rgba(29,158,117,.2);opacity:.5;">
-                      <div style="font-size:10px;font-weight:700;color:var(--gd);text-transform:uppercase;">Grup 1 · Az Tehlikeli</div>
-                      <div style="font-size:20px;font-weight:700;color:var(--gd);margin:3px 0;">5 Yıl</div>
-                      <div style="font-size:11px;color:var(--green);">Muayene · 8 saat/3yıl</div>
+                    <div class="pbox" id="p-g1" style="background:var(--gl);border:1px solid rgba(29,158,117,.2);">
+                      <div style="font-size:9px;font-weight:700;color:var(--gd);text-transform:uppercase;">Grup 1 · Az Tehlikeli</div>
+                      <div style="font-size:19px;font-weight:700;color:var(--gd);margin:3px 0;">5 Yıl</div>
+                      <div style="font-size:11px;color:var(--gr);">Muayene · 8 saat/3yıl</div>
                     </div>
                   </div>
-                  <div style="font-size:11px;background:var(--sur2);border:1px solid var(--bor);border-radius:var(--rs);padding:10px 12px;margin-top:8px;color:var(--tx2);" id="periyot-info">
-                    Bu firma <strong>Çok Tehlikeli</strong> olduğundan tüm gruplara <strong>1 Yıl</strong> tavan uygulanır.
-                  </div>
-                  <div style="font-size:11px;background:var(--al);border:1px solid rgba(186,117,23,.2);border-radius:var(--rs);padding:10px 12px;margin-top:6px;color:var(--ad);">
-                    <strong>Özel Politika:</strong> Gebe ve engelli çalışanlarda muayene her koşulda <strong>6 ay</strong>dır.
-                  </div>
+                  <div class="ib" id="periyot-info" style="background:var(--s2);border:1px solid var(--bo);color:var(--t2);">Bu firma <strong>Çok Tehlikeli</strong> olduğundan tüm gruplara <strong>1 Yıl</strong> tavan uygulanır.</div>
+                  <div class="ib" style="background:var(--al);border:1px solid rgba(186,117,23,.2);color:var(--ad);"><strong>Özel Politika:</strong> Gebe ve engelli çalışanlarda muayene süresi her koşulda <strong>6 ay</strong>dır.</div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="split-side">
+          <div class="ss">
             <div class="panel">
-              <div class="panel-title">Uyum Özeti</div>
-              <div class="mini-bar"><div class="mini-row"><span>Güncel</span><span style="color:var(--green);font-weight:600;" id="sp-guncel">—</span></div><div class="mini-track"><div class="mini-fill" id="sp-guncel-bar" style="background:var(--green);"></div></div></div>
-              <div class="mini-bar"><div class="mini-row"><span>Yaklaşıyor</span><span style="color:var(--amber);font-weight:600;" id="sp-yaklasan">—</span></div><div class="mini-track"><div class="mini-fill" id="sp-yaklasan-bar" style="background:var(--amber);"></div></div></div>
-              <div class="mini-bar"><div class="mini-row"><span>Geçmiş / Eksik</span><span style="color:var(--red);font-weight:600;" id="sp-gecmis">—</span></div><div class="mini-track"><div class="mini-fill" id="sp-gecmis-bar" style="background:var(--red);"></div></div></div>
+              <div class="pt">Uyum Özeti</div>
+              <div class="mb"><div class="mr"><span>Güncel</span><span style="color:var(--gr);font-weight:600;" id="sp-g">—</span></div><div class="mtr"><div class="mf" id="sp-g-b" style="background:var(--gr);"></div></div></div>
+              <div class="mb"><div class="mr"><span>Yaklaşıyor</span><span style="color:var(--am);font-weight:600;" id="sp-y">—</span></div><div class="mtr"><div class="mf" id="sp-y-b" style="background:var(--am);"></div></div></div>
+              <div class="mb"><div class="mr"><span>Eksik / Geçmiş</span><span style="color:var(--re);font-weight:600;" id="sp-e">—</span></div><div class="mtr"><div class="mf" id="sp-e-b" style="background:var(--re);"></div></div></div>
             </div>
             <div class="panel">
-              <div class="panel-title">Otomatik Servisler</div>
-              <div style="font-size:11px;color:var(--tx2);line-height:2.1;">
-                <div>📅 Pzt 09:00 — Haftalık eksik listesi</div>
+              <div class="pt">Otomatik Servisler</div>
+              <div style="font-size:11px;color:var(--t2);line-height:2.1;">
+                <div>📅 Her gün 09:00 — eksik listesi</div>
                 <div>⏰ 30 gün kala vade uyarısı</div>
                 <div>⏰ Bitiş günü acil bildirim</div>
-                <div>🔄 İK sync — pasife alma</div>
+                <div>🔄 İK sync — pasife alma bildirimi</div>
                 <div>📊 Yıl sonu analiz raporu</div>
               </div>
             </div>
             <div class="panel">
-              <div class="panel-title">Son Bildirimler</div>
+              <div class="pt">Son Bildirimler</div>
               <div id="sp-bildirimler"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- TAB: PERSONEL -->
+      <!-- TAB: PERSONEL LİSTESİ -->
       <div class="tabv" id="dtabv-personel">
         <div class="card">
           <div class="tbar">
-            <input class="inp" placeholder="Ad, TC ara…" style="width:190px;" oninput="filterPersonel(this.value)" />
-            <select class="sel" onchange="filterPersonelGrup(this.value)">
-              <option value="">Tüm Gruplar</option>
-              <option value="Grup 3">Grup 3</option>
-              <option value="Grup 2">Grup 2</option>
-              <option value="Grup 1">Grup 1</option>
+            <input class="inp" placeholder="Ad, TC ara…" style="width:170px;" oninput="filterPersonel(this.value)"/>
+            <select class="sel" onchange="filterGrup(this.value)">
+              <option value="">Tüm Gruplar</option><option value="Grup 3">Grup 3</option><option value="Grup 2">Grup 2</option><option value="Grup 1">Grup 1</option>
             </select>
-            <select class="sel"><option>Tüm Durumlar</option><option>Aktif</option><option>Pasif</option></select>
-            <div style="margin-left:auto;display:flex;gap:6px;">
-              <button class="btn sm" onclick="openModal('modal-excel')">📥 Excel Yükle</button>
+            <select class="sel" onchange="filterDurum(this.value)">
+              <option value="">Tüm Durumlar</option><option value="Aktif">Aktif</option><option value="Pasif">Pasif</option>
+            </select>
+            <div style="margin-left:auto;display:flex;gap:5px;">
+              <button class="btn sm" onclick="openM('m-excel-yukle')">📥 Excel Yükle</button>
               <button class="btn sm" onclick="toast('Excel indiriliyor…')">Excel ↓</button>
-              <button class="btn sm" onclick="toast('PDF oluşturuluyor…')">PDF ↓</button>
-              <button class="btn primary sm" onclick="openModal('modal-personel-ekle')">+ Personel Ekle</button>
+              <button class="btn sm" onclick="toast('PDF hazırlanıyor…')">PDF ↓</button>
+              <button class="btn pr sm" onclick="openM('m-personel-ekle')">+ Personel Ekle</button>
             </div>
           </div>
           <table>
-            <thead><tr><th>Personel</th><th>TC Kimlik No</th><th>Unvan</th><th>Grup</th><th>İşe Giriş</th><th>Durum</th><th>İşlem</th></tr></thead>
+            <thead><tr><th>Personel</th><th>TC Kimlik No</th><th>Görevi</th><th>Grup</th><th>İşe Giriş</th><th>Durum</th><th>İşlem</th></tr></thead>
             <tbody id="personel-tbody"></tbody>
           </table>
         </div>
       </div>
 
-      <!-- TAB: EĞİTİM & MUAYENE -->
+      <!-- TAB: EĞİTİM & MUAYENE DURUMU -->
       <div class="tabv" id="dtabv-durum">
         <div class="split">
-          <div class="split-main">
+          <div class="sm2">
             <div class="card">
               <div class="tbar">
-                <select class="sel"><option>Tüm Gruplar</option><option>Grup 1</option><option>Grup 2</option><option>Grup 3</option></select>
-                <select class="sel"><option>Eğitim Durumu</option><option>Güncel</option><option>Yaklaşıyor</option><option>Geçmiş</option></select>
-                <select class="sel"><option>Sağlık Durumu</option><option>Güncel</option><option>Kısıtlı</option><option>Geçmiş</option></select>
-                <select class="sel"><option>Kısıt</option><option>Yok</option><option>Var</option></select>
-                <div style="margin-left:auto;display:flex;gap:6px;">
-                  <button class="btn sm" onclick="toast('Excel aktarıldı ✓')">Excel ↓</button>
-                  <button class="btn sm" onclick="toast('PDF oluşturuluyor…')">PDF ↓</button>
+                <select class="sel"><option value="">Tüm Gruplar</option><option>Grup 3</option><option>Grup 2</option><option>Grup 1</option></select>
+                <select class="sel"><option value="">Eğitim Durumu</option><option>Güncel</option><option>Yaklaşıyor</option><option>Eksik/Geçmiş</option></select>
+                <select class="sel"><option value="">Muayene Durumu</option><option>Güncel</option><option>Yaklaşıyor</option><option>Eksik/Geçmiş</option></select>
+                <div style="margin-left:auto;display:flex;gap:5px;">
+                  <button class="btn sm" onclick="toast('Filtrelenmiş Excel aktarıldı ✓')">Excel ↓</button>
+                  <button class="btn sm" onclick="toast('PDF hazırlanıyor…')">PDF ↓</button>
                 </div>
               </div>
               <table>
-                <thead><tr><th>Personel</th><th>Grup</th><th>Eğitim</th><th>Saat</th><th>Muayene</th><th>Kısıt</th></tr></thead>
+                <thead><tr><th>Personel</th><th>Grup</th><th>Eğitim</th><th>Saat (Tamam/Gerekli)</th><th>Muayene</th><th>Son Muayene</th><th>Kısıt</th></tr></thead>
                 <tbody id="durum-tbody"></tbody>
               </table>
             </div>
           </div>
-          <div class="split-side">
+          <div class="ss">
             <div class="panel">
-              <div class="panel-title">Lamba Göstergesi</div>
-              <div style="font-size:12px;color:var(--tx2);line-height:2.3;">
-                <div style="display:flex;align-items:center;gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:var(--green);display:inline-block;"></span>Güncel</div>
-                <div style="display:flex;align-items:center;gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:var(--amber);display:inline-block;"></span>30 gün içinde doluyor</div>
-                <div style="display:flex;align-items:center;gap:7px;"><span style="width:9px;height:9px;border-radius:50%;background:var(--red);display:inline-block;"></span>Süresi geçmiş / eksik</div>
+              <div class="pt">Lamba Göstergesi</div>
+              <div style="font-size:12px;color:var(--t2);line-height:2.3;">
+                <div style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--gr);display:inline-block;"></span>Güncel</div>
+                <div style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--am);display:inline-block;"></span>30 gün içinde doluyor</div>
+                <div style="display:flex;align-items:center;gap:7px;"><span style="width:8px;height:8px;border-radius:50%;background:var(--re);display:inline-block;"></span>Süresi geçmiş / eksik</div>
               </div>
             </div>
             <div class="panel">
-              <div class="panel-title">Toplam Uyum</div>
-              <div style="font-size:34px;font-weight:700;color:var(--green);" id="uyum-pct">—</div>
-              <div style="font-size:11px;color:var(--tx3);">Hedef: %95</div>
-              <div class="mini-track" style="margin-top:8px;height:9px;border-radius:4px;"><div class="mini-fill" id="uyum-bar" style="height:100%;border-radius:4px;background:var(--green);"></div></div>
+              <div class="pt">Uyum Skoru</div>
+              <div style="font-size:30px;font-weight:700;color:var(--gr);" id="uyum-pct">—</div>
+              <div style="font-size:11px;color:var(--t3);">Hedef: %95</div>
+              <div class="mtr" style="margin-top:7px;height:8px;border-radius:4px;"><div class="mf" id="uyum-bar" style="height:100%;border-radius:4px;background:var(--gr);"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: İSG EVRAKLARI -->
+      <div class="tabv" id="dtabv-evrak">
+        <div style="font-size:13px;color:var(--t2);margin-bottom:14px;">Firmaya ait İSG evraklarını yükleyin veya indirin.</div>
+        <div class="evrak-grid">
+          <div class="evrak-card">
+            <div class="evrak-icon" style="background:var(--rl);">📋</div>
+            <div class="evrak-name">Risk Değerlendirmesi</div>
+            <div class="evrak-sub">Son güncelleme: 15.01.2025</div>
+            <div style="display:flex;gap:6px;margin-top:4px;">
+              <button class="btn xs" onclick="toast('Risk değerlendirmesi indiriliyor…')">İndir</button>
+              <button class="btn xs pr" onclick="toast('Dosya yüklendi ✓')">Güncelle</button>
+            </div>
+          </div>
+          <div class="evrak-card">
+            <div class="evrak-icon" style="background:var(--al);">🚨</div>
+            <div class="evrak-name">Acil Durum Planı</div>
+            <div class="evrak-sub">Son güncelleme: 22.03.2025</div>
+            <div style="display:flex;gap:6px;margin-top:4px;">
+              <button class="btn xs" onclick="toast('Acil durum planı indiriliyor…')">İndir</button>
+              <button class="btn xs pr" onclick="toast('Dosya yüklendi ✓')">Güncelle</button>
+            </div>
+          </div>
+          <div class="evrak-card">
+            <div class="evrak-icon" style="background:var(--gl);">✅</div>
+            <div class="evrak-name">İş Güvenliği Talimatları</div>
+            <div class="evrak-sub">Son güncelleme: 10.02.2025</div>
+            <div style="display:flex;gap:6px;margin-top:4px;">
+              <button class="btn xs" onclick="toast('Talimatlar indiriliyor…')">İndir</button>
+              <button class="btn xs pr" onclick="toast('Dosya yüklendi ✓')">Güncelle</button>
+            </div>
+          </div>
+          <div class="evrak-card">
+            <div class="evrak-icon" style="background:var(--bll);">🩺</div>
+            <div class="evrak-name">Sağlık Gözetim Dosyası</div>
+            <div class="evrak-sub">Son güncelleme: 05.03.2025</div>
+            <div style="display:flex;gap:6px;margin-top:4px;">
+              <button class="btn xs" onclick="toast('Dosya indiriliyor…')">İndir</button>
+              <button class="btn xs pr" onclick="toast('Dosya yüklendi ✓')">Güncelle</button>
+            </div>
+          </div>
+          <div class="evrak-card">
+            <div class="evrak-icon" style="background:var(--pl);">📊</div>
+            <div class="evrak-name">Yıllık Eğitim Planı</div>
+            <div class="evrak-sub">Son güncelleme: 01.01.2025</div>
+            <div style="display:flex;gap:6px;margin-top:4px;">
+              <button class="btn xs" onclick="toast('Plan indiriliyor…')">İndir</button>
+              <button class="btn xs pr" onclick="toast('Dosya yüklendi ✓')">Güncelle</button>
+            </div>
+          </div>
+          <div class="evrak-card" style="border:2px dashed var(--bo2);background:var(--s2);align-items:center;justify-content:center;text-align:center;">
+            <div style="font-size:24px;">+</div>
+            <div class="evrak-name" style="color:var(--t3);">Yeni Evrak Yükle</div>
+            <button class="btn xs pr" style="margin-top:4px;" onclick="toast('Dosya seçici açıldı')">Yükle</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB: KPI (FİRMA BAZLI) -->
+      <div class="tabv" id="dtabv-kpi">
+        <div class="sgrid" id="firma-kpi-grid"></div>
+        <div class="split">
+          <div class="sm2">
+            <div class="card">
+              <div class="ch"><span class="ct">Aylık Eğitim Saati Dağılımı</span></div>
+              <div class="cb">
+                <div id="firma-kpi-tablo"></div>
+              </div>
+            </div>
+          </div>
+          <div class="ss">
+            <div class="panel">
+              <div class="pt">Raporlar</div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <button class="btn sm" onclick="toast('Haftalık rapor mail gönderildi ✓')">📧 Haftalık Rapor</button>
+                <button class="btn sm" onclick="toast('Yıl sonu analizi PDF hazırlandı ✓')">📊 Yıl Sonu Analizi</button>
+                <button class="btn sm" onclick="toast('Excel indiriliyor…')">Excel ↓ Tüm Veriler</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ██ EĞİTİM ██ -->
+    <!-- ████ EĞİTİM ████ -->
     <div class="view" id="view-egitim">
       <div class="tabs">
-        <div class="tab active" id="etab-yasal" onclick="switchEgitim('yasal')">İSG Eğitimleri (Yasal)</div>
-        <div class="tab"        id="etab-diger" onclick="switchEgitim('diger')">Diğer Eğitimler (Arşiv)</div>
-        <div class="tab"        id="etab-toplu" onclick="switchEgitim('toplu')">Toplu Giriş</div>
+        <div class="tab active" id="etab-isg"   onclick="se('isg')">İSG Eğitimleri (Yasal)</div>
+        <div class="tab"        id="etab-diger" onclick="se('diger')">Diğer Eğitimler (Arşiv)</div>
+        <div class="tab"        id="etab-toplu" onclick="se('toplu')">Toplu Giriş</div>
       </div>
-      <div class="tabv active" id="etabv-yasal">
+
+      <div class="tabv active" id="etabv-isg">
         <div class="card">
-          <div class="card-head"><span class="card-title">İSG Yasal Eğitim Takibi</span><button class="btn primary sm" style="margin-left:auto;" onclick="openModal('modal-egitim-ekle')">+ Eğitim Gir</button></div>
+          <div class="ch">
+            <span class="ct">Merkezi İSG Eğitim Havuzu — Tüm Yıllar</span>
+            <div style="margin-left:auto;display:flex;gap:6px;">
+              <select class="sel"><option>Tüm Firmalar</option><option>ISS Facility Services</option><option>Securitas</option><option>ABC Metal</option><option>XYZ Lojistik</option></select>
+              <select class="sel"><option>Tüm Yıllar</option><option>2025</option><option>2024</option><option>2023</option></select>
+              <button class="btn pr sm" onclick="openM('m-egitim-ekle')">+ Eğitim Ekle</button>
+            </div>
+          </div>
           <table>
-            <thead><tr><th>Personel</th><th>Firma</th><th>Grup</th><th>Gereken</th><th>Tamamlanan</th><th>Kalan</th><th>Durum</th></tr></thead>
+            <thead><tr><th>Firma</th><th>Personel</th><th>TC</th><th>Görevi</th><th>Eğitim Türü</th><th>Tarih</th><th>Saat</th><th>Durum</th></tr></thead>
             <tbody>
-              <tr>
-                <td><div class="person"><div class="avatar" style="background:var(--rl);color:var(--rd);">AY</div><div style="font-weight:500;">Ahmet Yıldız</div></div></td>
-                <td style="color:var(--tx3);font-size:12px;">ABC Metal</td><td><span class="badge bg-r">G3</span></td><td>16 saat/yıl</td>
-                <td><div class="prog-wrap"><div class="prog-bar"><div class="prog-fill warn" style="width:87%;"></div></div><span style="font-size:11px;color:var(--tx2);min-width:32px;">14 s</span></div></td>
-                <td style="color:var(--amber);font-weight:600;">2 saat</td><td><span class="lamp la"><span class="lamp-dot"></span>Eksik</span></td>
-              </tr>
-              <tr>
-                <td><div class="person"><div class="avatar" style="background:var(--al);color:var(--ad);">FD</div><div style="font-weight:500;">Fatma Demir</div></div></td>
-                <td style="color:var(--tx3);font-size:12px;">ABC Metal</td><td><span class="badge bg-r">G3</span></td><td>16 saat/yıl</td>
-                <td><div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:100%;"></div></div><span style="font-size:11px;color:var(--tx2);min-width:32px;">16 s</span></div></td>
-                <td style="color:var(--green);">—</td><td><span class="lamp lg"><span class="lamp-dot"></span>Tam</span></td>
-              </tr>
-              <tr>
-                <td><div class="person"><div class="avatar" style="background:var(--gl);color:var(--gd);">MK</div><div style="font-weight:500;">Mustafa Kaya</div></div></td>
-                <td style="color:var(--tx3);font-size:12px;">XYZ Lojistik</td><td><span class="badge bg-a">G2</span></td><td>12 saat/2yıl</td>
-                <td><div class="prog-wrap"><div class="prog-bar"><div class="prog-fill" style="width:100%;"></div></div><span style="font-size:11px;color:var(--tx2);min-width:32px;">12 s</span></div></td>
-                <td style="color:var(--green);">—</td><td><span class="lamp lg"><span class="lamp-dot"></span>Tam</span></td>
-              </tr>
-              <tr>
-                <td><div class="person"><div class="avatar" style="background:#F1EFE8;color:#444441;">ZA</div><div style="font-weight:500;">Zeynep Arslan</div></div></td>
-                <td style="color:var(--tx3);font-size:12px;">ABC Metal</td><td><span class="badge bg-a">G2</span></td><td>12 saat/2yıl</td>
-                <td><div class="prog-wrap"><div class="prog-bar"><div class="prog-fill danger" style="width:42%;"></div></div><span style="font-size:11px;color:var(--tx2);min-width:32px;">5 s</span></div></td>
-                <td style="color:var(--red);font-weight:600;">7 saat</td><td><span class="lamp lr"><span class="lamp-dot"></span>Eksik</span></td>
-              </tr>
+              <tr><td style="font-size:12px;color:var(--t3);">Zorlu Tesis</td><td><div class="person"><div class="av" style="background:var(--gl);color:var(--gd);">UK</div><div style="font-weight:500;">Uğur Kulaz</div></div></td><td style="font-size:11px;color:var(--t3);">567 405 446 56</td><td style="font-size:12px;">İSG</td><td><span class="bdg bg">İSG</span></td><td style="font-size:12px;">01.01.2026</td><td style="font-size:12px;">8 s</td><td><span class="lamp la"><span class="ld"></span>Eksik (8/16)</span></td></tr>
+              <tr><td style="font-size:12px;color:var(--t3);">ABC Metal</td><td><div class="person"><div class="av" style="background:var(--rl);color:var(--rd);">AY</div><div style="font-weight:500;">Ahmet Yıldız</div></div></td><td style="font-size:11px;color:var(--t3);">123 456 789 00</td><td style="font-size:12px;">Makine Op.</td><td><span class="bdg br">İSG</span></td><td style="font-size:12px;">15.01.2025</td><td style="font-size:12px;">16 s</td><td><span class="lamp lg"><span class="ld"></span>Tamamlandı</span></td></tr>
+              <tr><td style="font-size:12px;color:var(--t3);">ABC Metal</td><td><div class="person"><div class="av" style="background:var(--al);color:var(--ad);">FD</div><div style="font-weight:500;">Fatma Demir</div></div></td><td style="font-size:11px;color:var(--t3);">234 567 890 11</td><td style="font-size:12px;">Kaynak Tek.</td><td><span class="bdg br">İSG</span></td><td style="font-size:12px;">15.01.2025</td><td style="font-size:12px;">8 s</td><td><span class="lamp la"><span class="ld"></span>Eksik (8/16)</span></td></tr>
+              <tr><td style="font-size:12px;color:var(--t3);">XYZ Lojistik</td><td><div class="person"><div class="av" style="background:var(--gl);color:var(--gd);">MK</div><div style="font-weight:500;">Mustafa Kaya</div></div></td><td style="font-size:11px;color:var(--t3);">345 678 901 22</td><td style="font-size:12px;">Forklift Op.</td><td><span class="bdg ba">İSG</span></td><td style="font-size:12px;">10.02.2025</td><td style="font-size:12px;">12 s</td><td><span class="lamp lg"><span class="ld"></span>Tamamlandı</span></td></tr>
             </tbody>
           </table>
         </div>
       </div>
+
       <div class="tabv" id="etabv-diger">
         <div class="card">
-          <div class="card-head"><span class="card-title">Diğer Eğitimler — Merkezi Arşiv</span><button class="btn primary sm" style="margin-left:auto;" onclick="openModal('modal-egitim-ekle')">+ Ekle</button></div>
-          <div style="font-size:12px;color:var(--tx3);padding:10px 14px;border-bottom:1px solid var(--bor);">Teknik ve mesleki eğitimler, yasal İSG saatini etkilemeden arşivlenir.</div>
+          <div class="ch"><span class="ct">Teknik / Mesleki Eğitim Arşivi</span><button class="btn pr sm" style="margin-left:auto;" onclick="openM('m-egitim-ekle')">+ Ekle</button></div>
+          <div style="font-size:12px;color:var(--t3);padding:8px 12px;border-bottom:1px solid var(--bo);">Bu eğitimler yasal İSG saatini etkilemez.</div>
           <table>
-            <thead><tr><th>Personel</th><th>Eğitim Adı</th><th>Tür</th><th>Tarih</th><th>Süre</th></tr></thead>
+            <thead><tr><th>Firma</th><th>Personel</th><th>TC</th><th>Eğitim Adı</th><th>Tür</th><th>Tarih</th><th>Süre</th></tr></thead>
             <tbody>
-              <tr><td style="font-weight:500;">Ahmet Yıldız</td><td>Vinç Operatörlüğü</td><td><span class="badge bg-b">Mesleki</span></td><td>15.06.2024</td><td>8 saat</td></tr>
-              <tr><td style="font-weight:500;">Hasan Çelik</td><td>Yangın Söndürme</td><td><span class="badge bg-a">Teknik</span></td><td>20.09.2024</td><td>4 saat</td></tr>
-              <tr><td style="font-weight:500;">Mustafa Kaya</td><td>İlk Yardım Sertifikası</td><td><span class="badge bg-g">Sertifika</span></td><td>10.11.2024</td><td>16 saat</td></tr>
+              <tr><td style="font-size:12px;color:var(--t3);">ABC Metal</td><td style="font-weight:500;">Ahmet Yıldız</td><td style="font-size:11px;color:var(--t3);">123 456 789 00</td><td>Vinç Operatörlüğü</td><td><span class="bdg bb">Mesleki</span></td><td>15.06.2024</td><td>8 s</td></tr>
+              <tr><td style="font-size:12px;color:var(--t3);">ABC Metal</td><td style="font-weight:500;">Hasan Çelik</td><td style="font-size:11px;color:var(--t3);">567 890 123 44</td><td>Yangın Söndürme</td><td><span class="bdg ba">Teknik</span></td><td>20.09.2024</td><td>4 s</td></tr>
+              <tr><td style="font-size:12px;color:var(--t3);">XYZ Lojistik</td><td style="font-weight:500;">Mustafa Kaya</td><td style="font-size:11px;color:var(--t3);">345 678 901 22</td><td>İlk Yardım Sertifikası</td><td><span class="bdg bg">Sertifika</span></td><td>10.11.2024</td><td>16 s</td></tr>
             </tbody>
           </table>
         </div>
       </div>
+
       <div class="tabv" id="etabv-toplu">
         <div class="card">
-          <div class="card-head"><span class="card-title">Toplu Eğitim Girişi</span></div>
-          <div class="card-body">
-            <div style="font-size:12px;color:var(--tx3);margin-bottom:14px;">Tek işlemle birden fazla firmanın personeline aynı anda eğitim işlenebilir. Parçalı saat girişi desteklenir.</div>
-            <div class="form-grid">
-              <div class="ff"><label>Eğitim Adı</label><input placeholder="Yıllık İSG Temel Eğitimi" /></div>
-              <div class="ff"><label>Tarih</label><input type="date" /></div>
-              <div class="ff"><label>Süre (Saat)</label><input type="number" placeholder="0" min="0" step="0.5" /></div>
-              <div class="ff"><label>Tür</label><select><option>İSG Yasal Eğitim</option><option>Teknik</option><option>Mesleki</option><option>Sertifika</option></select></div>
-              <div class="ff fc"><label>Firma Seçimi (Ctrl ile çoklu)</label><select multiple style="height:80px;"><option>ABC Metal San. A.Ş.</option><option>XYZ Lojistik Ltd.</option><option>Demo Tekstil A.Ş.</option></select></div>
-              <div class="ff fc"><label>Personel Seçimi</label><select multiple style="height:80px;"><option>Ahmet Yıldız</option><option>Fatma Demir</option><option>Mustafa Kaya</option><option>Hasan Çelik</option><option>Zeynep Arslan</option></select></div>
+          <div class="ch"><span class="ct">Toplu Eğitim Girişi — Excel Yükle</span></div>
+          <div class="cb">
+            <div style="font-size:12px;color:var(--t3);margin-bottom:12px;">
+              Excel sütun sırası: <strong>Firma | Eğitim Türü | Eğitim Tarihi | Eğitim Saati | Adı Soyadı | TC | Görevi</strong>
             </div>
-            <div style="margin-top:14px;display:flex;gap:8px;">
-              <button class="btn primary" onclick="toast('Toplu eğitim kaydedildi. 247 personele işlendi ✓')">Tümüne Uygula</button>
-              <button class="btn">Önizle</button>
+            <div style="overflow-x:auto;margin-bottom:14px;">
+              <table style="min-width:600px;border:1px solid var(--bo);border-radius:var(--rs);overflow:hidden;">
+                <thead><tr><th>Firma</th><th>Eğitim Türü</th><th>Eğitim Tarihi</th><th>Eğitim Saati</th><th>Adı Soyadı</th><th>TC</th><th>Görevi</th></tr></thead>
+                <tbody>
+                  <tr style="background:var(--gl);">
+                    <td style="font-size:12px;color:var(--gd);">Zorlu Tesis Yönetimi</td>
+                    <td style="font-size:12px;color:var(--gd);">İSG</td>
+                    <td style="font-size:12px;color:var(--gd);">01.01.2026</td>
+                    <td style="font-size:12px;color:var(--gd);">8</td>
+                    <td style="font-size:12px;color:var(--gd);">Uğur KULAZ</td>
+                    <td style="font-size:12px;color:var(--gd);">567 405 446 56</td>
+                    <td style="font-size:12px;color:var(--gd);">İSG</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="upz" onclick="toast('Dosya seçici açıldı')">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
+              <div style="font-weight:500;">.xlsx veya .xls sürükleyin / tıklayın</div>
+              <div style="font-size:12px;color:var(--t3);margin-top:3px;">Max 10 MB</div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;">
+              <button class="btn pr" onclick="toast('Toplu eğitim yüklendi, merkezi havuza eklendi ✓')">Yükle ve Kaydet</button>
+              <button class="btn sm" onclick="toast('Şablon Excel indiriliyor…')">📥 Şablon İndir</button>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ██ SAĞLIK ██ -->
+    <!-- ████ SAĞLIK ████ -->
     <div class="view" id="view-saglik">
-      <div class="split">
-        <div class="split-main">
-          <div class="card">
-            <div class="card-head">
-              <span class="card-title">Muayene Kayıtları</span>
-              <div style="margin-left:auto;display:flex;gap:8px;">
-                <select class="sel"><option>Tüm Firmalar</option><option>ABC Metal</option><option>XYZ Lojistik</option><option>Demo Tekstil</option></select>
-                <button class="btn primary sm" onclick="openModal('modal-muayene-ekle')">+ Muayene Ekle</button>
+      <div class="tabs">
+        <div class="tab active" id="stab-m" onclick="ss2('m')">Muayene Kayıtları</div>
+        <div class="tab"        id="stab-t" onclick="ss2('t')">Toplu Giriş</div>
+      </div>
+
+      <div class="tabv active" id="stabv-m">
+        <div class="split">
+          <div class="sm2">
+            <div class="card">
+              <div class="ch">
+                <span class="ct">Merkezi Muayene Havuzu — Tüm Yıllar</span>
+                <div style="margin-left:auto;display:flex;gap:6px;">
+                  <select class="sel"><option>Tüm Firmalar</option><option>ISS Facility Services</option><option>Securitas</option><option>ABC Metal</option></select>
+                  <select class="sel"><option>Tüm Yıllar</option><option>2025</option><option>2024</option></select>
+                  <button class="btn pr sm" onclick="openM('m-muayene-ekle')">+ Muayene Ekle</button>
+                </div>
+              </div>
+              <table>
+                <thead><tr><th>Firma</th><th>Personel</th><th>TC</th><th>Tür</th><th>Tarih</th><th>Periyot</th><th>Sonraki</th><th>Kanaat / Sonuç</th></tr></thead>
+                <tbody>
+                  <tr><td style="font-size:12px;color:var(--t3);">Zorlu Tesis</td><td style="font-weight:500;">Uğur Kulaz</td><td style="font-size:11px;color:var(--t3);">567 405 446 56</td><td><span class="bdg bb">Periyodik</span></td><td>01.01.2026</td><td><span class="bdg ba">3 Yıl</span></td><td style="color:var(--gr);">01.01.2029</td><td><span class="lamp lg"><span class="ld"></span>Çalışabilir</span></td></tr>
+                  <tr><td style="font-size:12px;color:var(--t3);">ABC Metal</td><td style="font-weight:500;">Ahmet Yıldız</td><td style="font-size:11px;color:var(--t3);">123 456 789 00</td><td><span class="bdg bb">Periyodik</span></td><td>10.03.2024</td><td><span class="bdg br">1 Yıl</span></td><td style="color:var(--re);font-weight:600;">10.03.2025 ⚠</td><td><span class="lamp lg"><span class="ld"></span>Çalışabilir</span></td></tr>
+                  <tr><td style="font-size:12px;color:var(--t3);">ABC Metal</td><td style="font-weight:500;">Fatma Demir</td><td style="font-size:11px;color:var(--t3);">234 567 890 11</td><td><span class="bdg bb">Periyodik</span></td><td>14.04.2024</td><td><span class="bdg br">1 Yıl</span></td><td style="color:var(--am);font-weight:600;">14.04.2025 ⏰</td><td><span class="lamp la"><span class="ld"></span>Kısıtlı — Tek Çalışamaz</span></td></tr>
+                  <tr><td style="font-size:12px;color:var(--t3);">ABC Metal</td><td style="font-weight:500;">Zeynep Arslan</td><td style="font-size:11px;color:var(--t3);">456 789 012 33</td><td><span class="bdg bg">İşe Giriş</span></td><td>01.02.2025</td><td><span class="bdg ba">6 Ay·Gebe</span></td><td style="color:var(--am);font-weight:600;">01.08.2025 ⏰</td><td><span class="lamp la"><span class="ld"></span>Kısıtlı — Gece Çalışamaz</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="ss">
+            <div class="panel">
+              <div class="pt">Protokol</div>
+              <div style="font-size:12px;color:var(--t2);line-height:1.9;">
+                <div>🔒 Tıbbi detay → yalnızca <strong>Hekim/Hemşire</strong></div>
+                <div>📧 Kısıt anında SMTP bildirimi</div>
+                <div>🔄 TCKN ile İK merge otomatik</div>
               </div>
             </div>
+            <div class="panel">
+              <div class="pt">Bu Ay</div>
+              <div style="font-size:11px;color:var(--t2);line-height:2.2;">
+                <div>✅ 18 muayene tamamlandı</div>
+                <div>⚠️ 5 muayene süresi geçti</div>
+                <div>⏰ 12 muayene yaklaşıyor</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabv" id="stabv-t">
+        <div class="card">
+          <div class="ch"><span class="ct">Toplu Muayene Girişi — Excel Yükle</span></div>
+          <div class="cb">
+            <div style="font-size:12px;color:var(--t3);margin-bottom:12px;">
+              Excel sütun sırası: <strong>Firma | Muayene Türü | Muayene Tarihi | Kanaat ve Sonuç | Adı Soyadı | TC | Görevi</strong>
+            </div>
+            <div style="overflow-x:auto;margin-bottom:14px;">
+              <table style="min-width:600px;border:1px solid var(--bo);border-radius:var(--rs);overflow:hidden;">
+                <thead><tr><th>Firma</th><th>Muayene Türü</th><th>Muayene Tarihi</th><th>Kanaat ve Sonuç</th><th>Adı Soyadı</th><th>TC</th><th>Görevi</th></tr></thead>
+                <tbody>
+                  <tr style="background:var(--gl);">
+                    <td style="font-size:12px;color:var(--gd);">Zorlu Tesis Yönetimi</td>
+                    <td style="font-size:12px;color:var(--gd);">İSG</td>
+                    <td style="font-size:12px;color:var(--gd);">01.01.2026</td>
+                    <td style="font-size:12px;color:var(--gd);">Yüksekte Çalışamaz</td>
+                    <td style="font-size:12px;color:var(--gd);">Uğur KULAZ</td>
+                    <td style="font-size:12px;color:var(--gd);">567 405 446 56</td>
+                    <td style="font-size:12px;color:var(--gd);">İSG</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="upz" onclick="toast('Dosya seçici açıldı')">
+              <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
+              <div style="font-weight:500;">.xlsx veya .xls sürükleyin / tıklayın</div>
+              <div style="font-size:12px;color:var(--t3);margin-top:3px;">Max 10 MB</div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;">
+              <button class="btn pr" onclick="toast('Toplu muayene yüklendi, merkezi havuza eklendi ✓')">Yükle ve Kaydet</button>
+              <button class="btn sm" onclick="toast('Şablon Excel indiriliyor…')">📥 Şablon İndir</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ████ KPI (GENEL) ████ -->
+    <div class="view" id="view-kpi">
+      <div class="kgrid">
+        <div class="kc"><div class="kv" style="color:var(--gr);">%84</div><div class="kl">Genel Eğitim Uyum Oranı</div><div class="ks">Hedef %95 · Önceki ay %81</div></div>
+        <div class="kc"><div class="kv" style="color:var(--am);">%79</div><div class="kl">Genel Muayene Uyum Oranı</div><div class="ks">Hedef %95 · Önceki ay %76</div></div>
+        <div class="kc"><div class="kv" style="color:var(--re);">38</div><div class="kl">Toplam Eğitim Eksik</div><div class="ks">4 firmada · Bu hafta +3</div></div>
+        <div class="kc"><div class="kv" style="color:var(--re);">24</div><div class="kl">Toplam Muayene Eksik</div><div class="ks">4 firmada · Bu hafta +1</div></div>
+        <div class="kc"><div class="kv" style="color:var(--bl);">597</div><div class="kl">Toplam Aktif Personel</div><div class="ks">4 firma · Bu ay +12</div></div>
+        <div class="kc"><div class="kv" style="color:var(--pu);">1.240</div><div class="kl">Yıl İçi Toplam Eğitim Saati</div><div class="ks">Tüm firmalar · 2025</div></div>
+      </div>
+      <div class="split">
+        <div class="sm2">
+          <div class="card">
+            <div class="ch"><span class="ct">Firma Bazlı Uyum Tablosu</span><button class="btn sm" style="margin-left:auto;" onclick="toast('Excel indiriliyor…')">Excel ↓</button></div>
             <table>
-              <thead><tr><th>Personel</th><th>Firma</th><th>Muayene Tarihi</th><th>Periyot</th><th>Sonraki Muayene</th><th>Sonuç</th><th>Kısıt</th></tr></thead>
-              <tbody>
-                <tr><td style="font-weight:500;">Ahmet Yıldız</td><td style="font-size:12px;color:var(--tx3);">ABC Metal</td><td>10.03.2024</td><td><span class="badge bg-r">1 Yıl</span></td><td style="color:var(--red);font-weight:600;">10.03.2025 ⚠</td><td><span class="lamp lg"><span class="lamp-dot"></span>Çalışabilir</span></td><td style="color:var(--tx3);">—</td></tr>
-                <tr><td style="font-weight:500;">Fatma Demir</td><td style="font-size:12px;color:var(--tx3);">ABC Metal</td><td>14.04.2024</td><td><span class="badge bg-r">1 Yıl</span></td><td style="color:var(--amber);font-weight:600;">14.04.2025 ⏰</td><td><span class="lamp la"><span class="lamp-dot"></span>Kısıtlı</span></td><td style="color:var(--red);font-weight:500;font-size:12px;">Tek Çalışamaz</td></tr>
-                <tr><td style="font-weight:500;">Zeynep Arslan</td><td style="font-size:12px;color:var(--tx3);">ABC Metal</td><td>01.02.2025</td><td><span class="badge bg-a">6 Ay · Gebe</span></td><td style="color:var(--amber);font-weight:600;">01.08.2025 ⏰</td><td><span class="lamp la"><span class="lamp-dot"></span>Kısıtlı</span></td><td style="color:var(--blue);font-weight:500;font-size:12px;">Gece Çalışamaz</td></tr>
-                <tr><td style="font-weight:500;">Mustafa Kaya</td><td style="font-size:12px;color:var(--tx3);">XYZ Lojistik</td><td>20.01.2025</td><td><span class="badge bg-a">3 Yıl</span></td><td style="color:var(--green);">20.01.2028</td><td><span class="lamp lg"><span class="lamp-dot"></span>Çalışabilir</span></td><td style="color:var(--tx3);">—</td></tr>
-              </tbody>
+              <thead><tr><th>No</th><th>Firma</th><th>Çalışan</th><th>Eğitim Uyum</th><th>Muayene Uyum</th><th>Eğitim Eksik</th><th>Muayene Eksik</th><th>Detay</th></tr></thead>
+              <tbody id="kpi-tbody"></tbody>
             </table>
           </div>
         </div>
-        <div class="split-side">
-          <div class="panel"><div class="panel-title">Gizlilik</div><div style="font-size:12px;color:var(--tx2);line-height:1.7;">Tıbbi detaylar yalnızca <strong>Hekim</strong> ve <strong>Hemşire</strong> görebilir. Diğerleri yalnızca kısıt sonucunu görür.</div></div>
-          <div class="panel"><div class="panel-title">Anlık Bildirim</div><div style="font-size:12px;color:var(--tx2);line-height:1.7;">Kısıt kaydedildiği an ilgili firmanın mail grubuna otomatik SMTP bildirimi gönderilir.</div></div>
-          <div class="panel"><div class="panel-title">İşe Giriş Protokolü</div><div style="font-size:12px;color:var(--tx2);line-height:1.7;">Sağlık birimi İK listesini beklemeden ekleyebilir. İlk Excel yüklemesinde TCKN ile otomatik birleştirilir.</div></div>
+        <div class="ss">
+          <div class="panel">
+            <div class="pt">Acil Aksiyon</div>
+            <div class="ar"><div class="ad" style="background:var(--re);"></div><div>Securitas — 18 eğitim eksik</div></div>
+            <div class="ar"><div class="ad" style="background:var(--re);"></div><div>ISS — 12 muayene geçti</div></div>
+            <div class="ar"><div class="ad" style="background:var(--am);"></div><div>ABC Metal — 8 eğitim yaklaşıyor</div></div>
+            <div class="ar"><div class="ad" style="background:var(--am);"></div><div>XYZ — 4 muayene yaklaşıyor</div></div>
+          </div>
+          <div class="panel">
+            <div class="pt">Raporlar</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <button class="btn sm" onclick="toast('Günlük rapor tüm firmalara gönderildi ✓')">📧 Günlük Rapor Gönder</button>
+              <button class="btn sm" onclick="toast('Yıl sonu analizi PDF hazırlandı ✓')">📊 Yıl Sonu Analizi</button>
+              <button class="btn sm" onclick="toast('Excel indiriliyor…')">Excel ↓ Tüm Veriler</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-  </div>
-</div>
-</div>
+  </div><!-- /cnt -->
+</div><!-- /main -->
+</div><!-- /app -->
 
-<!-- MODALS -->
-<div class="overlay" id="modal-firma-ekle">
+<!-- ══════ MODALS ══════ -->
+
+<!-- Firma Ekle -->
+<div class="ov" id="m-firma-ekle">
   <div class="modal">
-    <div class="modal-head"><h3>Yeni Firma Ekle</h3><button class="modal-x" onclick="closeModal('modal-firma-ekle')">✕</button></div>
-    <div class="modal-body"><div class="form-grid">
-      <div class="ff fc"><label>Firma Adı</label><input placeholder="Firma Adı" /></div>
+    <div class="mh"><h3>Yeni Firma Ekle</h3><button class="mx" onclick="closeM('m-firma-ekle')">✕</button></div>
+    <div class="mbody"><div class="fg">
+      <div class="ff fc"><label>Firma Adı</label><input placeholder="Firma Adı"/></div>
       <div class="ff"><label>Tehlike Sınıfı</label><select><option>Çok Tehlikeli</option><option>Tehlikeli</option><option>Az Tehlikeli</option></select></div>
-      <div class="ff"><label>İş Kolu</label><input placeholder="Metal İmalat" /></div>
-      <div class="ff"><label>NACE Kodu</label><input placeholder="24.51" /></div>
-      <div class="ff fc"><label>Bildirim Mail Grubu</label><input placeholder="isg@firma.com, ik@firma.com" /></div>
+      <div class="ff"><label>İş Kolu</label><input placeholder="Metal İmalat"/></div>
+      <div class="ff"><label>NACE Kodu</label><input placeholder="24.51"/></div>
+      <div class="ff fc"><label>Bildirim Mail Grubu</label><input placeholder="isg@firma.com, ik@firma.com"/></div>
     </div></div>
-    <div class="modal-foot"><button class="btn" onclick="closeModal('modal-firma-ekle')">İptal</button><button class="btn primary" onclick="closeModal('modal-firma-ekle');toast('Firma eklendi ✓')">Kaydet</button></div>
+    <div class="mft"><button class="btn" onclick="closeM('m-firma-ekle')">İptal</button><button class="btn pr" onclick="closeM('m-firma-ekle');toast('Firma eklendi ✓')">Kaydet</button></div>
   </div>
 </div>
 
-<div class="overlay" id="modal-personel-ekle">
+<!-- Personel Ekle -->
+<div class="ov" id="m-personel-ekle">
   <div class="modal">
-    <div class="modal-head"><h3>Yeni Personel Ekle</h3><button class="modal-x" onclick="closeModal('modal-personel-ekle')">✕</button></div>
-    <div class="modal-body"><div class="form-grid">
-      <div class="ff"><label>Ad</label><input placeholder="Ad" /></div>
-      <div class="ff"><label>Soyad</label><input placeholder="Soyad" /></div>
-      <div class="ff"><label>TC Kimlik No</label><input placeholder="11 haneli" maxlength="11" /></div>
-      <div class="ff"><label>Unvan</label><input placeholder="Makine Operatörü" /></div>
-      <div class="ff"><label>İşe Giriş Tarihi</label><input type="date" /></div>
-      <div class="ff"><label>Personel Grubu</label><select><option>Grup 3 — Çok Tehlikeli</option><option>Grup 2 — Tehlikeli</option><option>Grup 1 — Az Tehlikeli</option></select></div>
-      <div class="ff fc"><label>Özel Durum</label><select><option>Yok</option><option>Gebe (6 ay periyot)</option><option>Engelli (6 ay periyot)</option></select></div>
+    <div class="mh"><h3>Yeni Personel Ekle</h3><button class="mx" onclick="closeM('m-personel-ekle')">✕</button></div>
+    <div class="mbody"><div class="fg">
+      <div class="ff"><label>Ad</label><input placeholder="Ad"/></div>
+      <div class="ff"><label>Soyad</label><input placeholder="Soyad"/></div>
+      <div class="ff"><label>TC Kimlik No</label><input placeholder="11 haneli" maxlength="11"/></div>
+      <div class="ff"><label>Görevi / Unvan</label><input placeholder="Makine Operatörü"/></div>
+      <div class="ff"><label>İşe Giriş Tarihi</label><input type="date"/></div>
+      <div class="ff"><label>Personel Grubu</label>
+        <select><option>Grup 3 — Çok Tehlikeli</option><option>Grup 2 — Tehlikeli</option><option>Grup 1 — Az Tehlikeli</option></select>
+      </div>
+      <div class="ff fc"><label>Özel Durum</label>
+        <select><option>Yok</option><option>Gebe (6 ay periyot)</option><option>Engelli (6 ay periyot)</option></select>
+      </div>
     </div></div>
-    <div class="modal-foot"><button class="btn" onclick="closeModal('modal-personel-ekle')">İptal</button><button class="btn primary" onclick="closeModal('modal-personel-ekle');toast('Personel eklendi ✓')">Kaydet</button></div>
+    <div class="mft"><button class="btn" onclick="closeM('m-personel-ekle')">İptal</button><button class="btn pr" onclick="closeM('m-personel-ekle');toast('Personel eklendi ✓')">Kaydet</button></div>
   </div>
 </div>
 
-<div class="overlay" id="modal-excel">
+<!-- Excel Yükle / İK Sync -->
+<div class="ov" id="m-excel-yukle">
   <div class="modal">
-    <div class="modal-head"><h3>İK Excel Yükle</h3><button class="modal-x" onclick="closeModal('modal-excel')">✕</button></div>
-    <div class="modal-body">
-      <div class="upload-zone" onclick="toast('Dosya seçici açıldı')">
+    <div class="mh"><h3>İK Listesi — Excel Yükle &amp; Senkronize Et</h3><button class="mx" onclick="closeM('m-excel-yukle')">✕</button></div>
+    <div class="mbody">
+      <div class="upz" onclick="toast('Dosya seçici açıldı')">
         <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/></svg>
-        <div style="font-weight:500;">.xlsx veya .xls sürükleyin</div>
-        <div style="font-size:12px;color:var(--tx3);margin-top:4px;">Max 10 MB</div>
+        <div style="font-weight:500;">.xlsx veya .xls sürükleyin / tıklayın</div>
+        <div style="font-size:12px;color:var(--t3);margin-top:3px;">Max 10 MB</div>
       </div>
-      <div style="font-size:12px;background:var(--al);border-radius:var(--rs);padding:10px;margin-top:12px;color:var(--ad);">
-        <strong>İK Senkronizasyonu:</strong> Excel'de olmayan aktif personeller otomatik <strong>Pasif</strong>'e çekilir, İSG grubuna bildirim gönderilir.
+      <div class="ib" style="background:var(--al);border:1px solid rgba(186,117,23,.2);color:var(--ad);">
+        <strong>İK Senkronizasyonu:</strong> Yeni liste mevcut liste ile karşılaştırılır. Listede olmayan aktif personeller için <strong>onay alınır</strong>, ardından pasife çekilir ve İSG grubuna bildirim gönderilir. Pasife çekilen personel sonradan tekrar aktif edilebilir.
       </div>
     </div>
-    <div class="modal-foot"><button class="btn" onclick="closeModal('modal-excel')">İptal</button><button class="btn primary" onclick="closeModal('modal-excel');toast('Excel yüklendi, senkronize edildi ✓')">Yükle &amp; Senkronize Et</button></div>
+    <div class="mft"><button class="btn" onclick="closeM('m-excel-yukle')">İptal</button><button class="btn pr" onclick="closeM('m-excel-yukle');showConfirm()">Yükle ve Karşılaştır</button></div>
   </div>
 </div>
 
-<div class="overlay" id="modal-muayene-ekle">
-  <div class="modal" style="width:540px;">
-    <div class="modal-head"><h3>Muayene Kaydı Gir</h3><button class="modal-x" onclick="closeModal('modal-muayene-ekle')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-grid" style="margin-bottom:14px;">
-        <div class="ff"><label>Personel (Ad / TC)</label><input placeholder="Ara…" /></div>
-        <div class="ff"><label>Muayene Tarihi</label><input type="date" /></div>
-        <div class="ff"><label>Muayene Türü</label><select><option>İşe Giriş</option><option>Periyodik</option><option>İşe Dönüş</option></select></div>
-        <div class="ff"><label>Sonuç</label><select><option>Çalışabilir</option><option>Kısıtlı Çalışabilir</option><option>Çalışamaz</option></select></div>
-      </div>
-      <div style="font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:8px;">Çalışma Koşulları</div>
-      <label class="check-item checked"><input type="checkbox" checked onchange="toggleCheck(this)"> Yüksekte çalışabilir</label>
-      <label class="check-item checked"><input type="checkbox" checked onchange="toggleCheck(this)"> Gece vardiyasında çalışabilir</label>
-      <label class="check-item"><input type="checkbox" onchange="toggleCheck(this)"> Tek başına çalışabilir</label>
-      <label class="check-item checked"><input type="checkbox" checked onchange="toggleCheck(this)"> Ağır yük kaldırabilir</label>
-      <label class="check-item"><input type="checkbox" onchange="toggleCheck(this)"> Kimyasal ortamda çalışabilir</label>
-      <div class="ff fc" style="margin-top:12px;"><label>Manuel Kısıt Notu (Yalnızca Hekim/Hemşire görür)</label><input placeholder="Örn: Sol diz protezi — merdiven kısıtlı" /></div>
+<!-- Pasif Onay -->
+<div class="ov" id="m-confirm">
+  <div class="cfm">
+    <h3>⚠️ İK Senkronizasyon Onayı</h3>
+    <p>Yüklenen listede <strong>10 aktif personel</strong> bulunamadı.</p>
+    <p>Bu kişiler <strong>Pasif</strong>'e çekilecek ve İSG grubuna şu mail gönderilecektir:<br><em style="color:var(--ad);">"Personel çıkmıştır, yıllık eğitim planından çıkartınız."</em></p>
+    <p style="font-size:12px;color:var(--t3);">Pasife çekilen personeller daha sonra tekrar aktif edilebilir.</p>
+    <div class="cfm-act">
+      <button class="btn" onclick="closeM('m-confirm');toast('İşlem iptal edildi.')">Hayır, İptal Et</button>
+      <button class="btn pr" onclick="closeM('m-confirm');toast('10 personel pasife çekildi. İSG grubuna mail gönderildi ✓')">Evet, Pasife Çek (10 kişi)</button>
     </div>
-    <div class="modal-foot"><button class="btn" onclick="closeModal('modal-muayene-ekle')">İptal</button><button class="btn primary" onclick="closeModal('modal-muayene-ekle');toast('Muayene kaydedildi, kısıtlar bildirildi ✓')">Kaydet &amp; Bildir</button></div>
   </div>
 </div>
 
-<div class="overlay" id="modal-egitim-ekle">
-  <div class="modal">
-    <div class="modal-head"><h3>Eğitim Kaydı Gir</h3><button class="modal-x" onclick="closeModal('modal-egitim-ekle')">✕</button></div>
-    <div class="modal-body"><div class="form-grid">
-      <div class="ff"><label>Eğitim Adı</label><input placeholder="İSG Temel Eğitimi" /></div>
-      <div class="ff"><label>Tarih</label><input type="date" /></div>
-      <div class="ff"><label>Süre (Saat)</label><input type="number" placeholder="0" min="0" step="0.5" /></div>
-      <div class="ff"><label>Tür</label><select><option>İSG Yasal</option><option>Teknik</option><option>Mesleki</option><option>Sertifika</option></select></div>
-      <div class="ff fc"><label>Katılan Personel (Ctrl ile çoklu)</label><select multiple style="height:100px;"><option>Ahmet Yıldız</option><option>Fatma Demir</option><option>Mustafa Kaya</option><option>Hasan Çelik</option><option>Zeynep Arslan</option></select></div>
-    </div></div>
-    <div class="modal-foot"><button class="btn" onclick="closeModal('modal-egitim-ekle')">İptal</button><button class="btn primary" onclick="closeModal('modal-egitim-ekle');toast('Eğitim kaydedildi ✓')">Kaydet</button></div>
+<!-- Eğitim Ekle -->
+<div class="ov" id="m-egitim-ekle">
+  <div class="modal wd">
+    <div class="mh"><h3>Eğitim Kaydı Ekle</h3><button class="mx" onclick="closeM('m-egitim-ekle')">✕</button></div>
+    <div class="mbody">
+      <div class="fg">
+        <div class="ff"><label>Firma</label>
+          <select><option>ISS Facility Services</option><option>Securitas</option><option>ABC Metal San. A.Ş.</option><option>XYZ Lojistik</option><option>Zorlu Tesis Yönetimi</option></select>
+        </div>
+        <div class="ff"><label>Eğitim Türü</label>
+          <select><option>İSG Temel Eğitim</option><option>Yüksekte Çalışma</option><option>Acil Durum</option><option>İlk Yardım</option><option>Yangın Söndürme</option><option>Kimyasal Güvenlik</option><option>Diğer</option></select>
+        </div>
+        <div class="ff"><label>Eğitim Tarihi</label><input type="date"/></div>
+        <div class="ff"><label>Eğitim Süresi (Saat)</label>
+          <select><option>1</option><option>2</option><option>4</option><option>8</option><option>12</option><option>16</option></select>
+        </div>
+        <div class="ff fc"><label>Katılımcılar (Ctrl ile çoklu seçim)</label>
+          <select multiple style="height:90px;">
+            <option>Uğur Kulaz — 567 405 446 56</option>
+            <option>Ahmet Yıldız — 123 456 789 00</option>
+            <option>Fatma Demir — 234 567 890 11</option>
+            <option>Mustafa Kaya — 345 678 901 22</option>
+            <option>Hasan Çelik — 567 890 123 44</option>
+            <option>Zeynep Arslan — 456 789 012 33</option>
+          </select>
+        </div>
+      </div>
+      <div class="ib" style="background:var(--bll);border:1px solid rgba(24,95,165,.2);color:var(--bd);">Kayıt merkezi eğitim havuzuna eklenir. Firma personel listesindeki eğitim durumu otomatik güncellenir.</div>
+    </div>
+    <div class="mft"><button class="btn" onclick="closeM('m-egitim-ekle')">İptal</button><button class="btn pr" onclick="closeM('m-egitim-ekle');toast('Eğitim kaydedildi, havuza eklendi ✓')">Kaydet</button></div>
+  </div>
+</div>
+
+<!-- Muayene Ekle -->
+<div class="ov" id="m-muayene-ekle">
+  <div class="modal wd">
+    <div class="mh"><h3>Muayene Kaydı Ekle</h3><button class="mx" onclick="closeM('m-muayene-ekle')">✕</button></div>
+    <div class="mbody">
+      <div class="fg">
+        <div class="ff"><label>Firma</label>
+          <select><option>ISS Facility Services</option><option>Securitas</option><option>ABC Metal San. A.Ş.</option><option>XYZ Lojistik</option><option>Zorlu Tesis Yönetimi</option></select>
+        </div>
+        <div class="ff"><label>Muayene Türü</label>
+          <select><option>İşe Giriş</option><option>Periyodik</option><option>İş Kazası Sonrası</option><option>İşe Dönüş</option><option>Diğer</option></select>
+        </div>
+        <div class="ff"><label>Muayene Tarihi</label><input type="date"/></div>
+        <div class="ff"><label>Sonuç</label>
+          <select><option>Çalışabilir</option><option>Kısıtlı Çalışabilir</option><option>Çalışamaz</option></select>
+        </div>
+        <div class="ff fc"><label>Kanaat ve Sonuç Notu</label>
+          <textarea style="height:65px;" placeholder="Muayene bulguları ve kanaat…"></textarea>
+        </div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--t2);margin:11px 0 6px;">Çalışma Koşulları</div>
+      <label class="chk checked"><input type="checkbox" checked onchange="toggleChk(this)"> Yüksekte çalışabilir</label>
+      <label class="chk checked"><input type="checkbox" checked onchange="toggleChk(this)"> Gece vardiyasında çalışabilir</label>
+      <label class="chk"><input type="checkbox" onchange="toggleChk(this)"> Tek başına çalışabilir</label>
+      <label class="chk checked"><input type="checkbox" checked onchange="toggleChk(this)"> Ağır yük kaldırabilir</label>
+      <label class="chk"><input type="checkbox" onchange="toggleChk(this)"> Kimyasal ortamda çalışabilir</label>
+      <div class="ff fc" style="margin-top:10px;"><label>Kısıt Notu (Yalnızca Hekim/Hemşire görür)</label><input placeholder="Örn: Sol diz protezi — merdiven kısıtlı"/></div>
+      <div class="ff fc" style="margin-top:8px;"><label>Katılımcılar (Ctrl ile çoklu)</label>
+        <select multiple style="height:80px;">
+          <option>Uğur Kulaz — 567 405 446 56</option>
+          <option>Ahmet Yıldız — 123 456 789 00</option>
+          <option>Fatma Demir — 234 567 890 11</option>
+          <option>Zeynep Arslan — 456 789 012 33</option>
+        </select>
+      </div>
+      <div class="ib" style="background:var(--bll);border:1px solid rgba(24,95,165,.2);color:var(--bd);">Kısıtlar kaydedildiği an ilgili firmanın mail grubuna otomatik SMTP bildirimi gönderilir.</div>
+    </div>
+    <div class="mft"><button class="btn" onclick="closeM('m-muayene-ekle')">İptal</button><button class="btn pr" onclick="closeM('m-muayene-ekle');toast('Muayene kaydedildi, kısıtlar bildirildi ✓')">Kaydet &amp; Bildir</button></div>
   </div>
 </div>
 
 <div id="toast"></div>
 
 <script>
-const firmalar = [
-  { id:'abc', adi:'ABC Metal San. A.Ş.', sinif:'Çok Tehlikeli', sinifKey:'cok', iskolu:'Metal İmalat', nace:'24.51', mail:'isg@abc-metal.com, ik@abc-metal.com', calisanSayisi:98, egitimPct:82, muayenePct:71,
-    personel:[
-      { ad:'Ahmet Yıldız',  tc:'123 456 789 00', unvan:'Makine Operatörü',   grup:'Grup 3', giris:'12.03.2022', durum:'Aktif', renk:'#FCEBEB', tx:'#791F1F', init:'AY', egitimLamp:'la', muayeneLamp:'lr', kisit:'—' },
-      { ad:'Fatma Demir',   tc:'234 567 890 11', unvan:'Kaynak Teknisyeni',  grup:'Grup 3', giris:'05.07.2021', durum:'Aktif', renk:'#FAEEDA', tx:'#633806', init:'FD', egitimLamp:'la', muayeneLamp:'la', kisit:'Tek Çalışamaz' },
-      { ad:'Zeynep Arslan', tc:'456 789 012 33', unvan:'Kalite Kontrol',     grup:'Grup 2', giris:'22.09.2020', durum:'Aktif', renk:'#F1EFE8', tx:'#444441', init:'ZA', egitimLamp:'lr', muayeneLamp:'la', kisit:'Gece Çalışamaz' },
-      { ad:'Hasan Çelik',   tc:'567 890 123 44', unvan:'Güvenlik Görevlisi', grup:'Grup 1', giris:'30.04.2024', durum:'Aktif', renk:'#E6F1FB', tx:'#0C447C', init:'HÇ', egitimLamp:'lg', muayeneLamp:'lg', kisit:'—' },
+// ══ VERİ ══
+const DB={
+  firmalar:[
+    {id:'iss', no:1,adi:'ISS Facility Services',  sinif:'Az Tehlikeli', sk:'az', iskolu:'Temizlik & Güvenlik',    nace:'81.10',mail:'isg@iss.com, ik@iss.com',       cal:100,egE:5, muE:3, egP:95,muP:97,
+     bil:[{d:'var(--am)',t:'Ali Veli — muayene 22 gün kaldı'}]},
+    {id:'sec',no:2,adi:'Securitas',                sinif:'Tehlikeli',    sk:'teh',iskolu:'Özel Güvenlik',           nace:'80.10',mail:'isg@securitas.com',              cal:250,egE:18,muE:12,egP:74,muP:80,
+     bil:[{d:'var(--re)',t:'18 personel eğitim eksik'},{d:'var(--re)',t:'12 muayene süresi geçti'}]},
+    {id:'abc',no:3,adi:'ABC Metal San. A.Ş.',      sinif:'Çok Tehlikeli',sk:'cok',iskolu:'Metal İmalat',           nace:'24.51',mail:'isg@abc-metal.com, ik@abc-metal.com',cal:98,egE:12,muE:7, egP:82,muP:71,
+     bil:[{d:'var(--re)',t:'Ahmet Yıldız — muayene doldu'},{d:'var(--am)',t:'Fatma Demir — 15 gün kaldı'},{d:'var(--bl)',t:'2 personel pasife alındı'}]},
+    {id:'xyz',no:4,adi:'XYZ Lojistik Ltd. Şti.',   sinif:'Tehlikeli',    sk:'teh',iskolu:'Taşımacılık & Depo',     nace:'49.41',mail:'isg@xyz.com',                    cal:74, egE:3, muE:2, egP:91,muP:88,
+     bil:[{d:'var(--am)',t:'Ali Yılmaz — muayene 22 gün kaldı'}]},
+  ],
+  personel:{
+    abc:[
+      {ad:'Ahmet Yıldız', tc:'123 456 789 00',gorev:'Makine Operatörü', grup:'Grup 3',giris:'12.03.2022',durum:'Aktif',rk:'#FCEBEB',tx:'#791F1F',init:'AY',eL:'la',mL:'lr',kisit:'—'},
+      {ad:'Fatma Demir',  tc:'234 567 890 11',gorev:'Kaynak Tek.',      grup:'Grup 3',giris:'05.07.2021',durum:'Aktif',rk:'#FAEEDA',tx:'#633806',init:'FD',eL:'la',mL:'la',kisit:'Tek Çalışamaz'},
+      {ad:'Zeynep Arslan',tc:'456 789 012 33',gorev:'Kalite Kontrol',   grup:'Grup 2',giris:'22.09.2020',durum:'Aktif',rk:'#F1EFE8',tx:'#444441',init:'ZA',eL:'lr',mL:'la',kisit:'Gece Çalışamaz'},
+      {ad:'Hasan Çelik',  tc:'567 890 123 44',gorev:'Güvenlik',         grup:'Grup 1',giris:'30.04.2024',durum:'Aktif',rk:'#E6F1FB',tx:'#0C447C',init:'HÇ',eL:'lg',mL:'lg',kisit:'—'},
     ],
-    bildirimler:[
-      { dot:'var(--red)',   txt:'Ahmet Yıldız — muayene süresi doldu' },
-      { dot:'var(--amber)', txt:'Fatma Demir — 15 gün kaldı' },
-      { dot:'var(--amber)', txt:'3 kişi — eğitim 30 gün içinde' },
-      { dot:'var(--blue)',  txt:'2 personel pasife alındı (İK sync)' },
-    ]
-  },
-  { id:'xyz', adi:'XYZ Lojistik Ltd. Şti.', sinif:'Tehlikeli', sinifKey:'teh', iskolu:'Taşımacılık & Depolama', nace:'49.41', mail:'isg@xyz.com', calisanSayisi:74, egitimPct:91, muayenePct:88,
-    personel:[
-      { ad:'Mustafa Kaya', tc:'345 678 901 22', unvan:'Forklift Operatörü', grup:'Grup 2', giris:'18.01.2023', durum:'Aktif', renk:'#E1F5EE', tx:'#085041', init:'MK', egitimLamp:'lg', muayeneLamp:'lg', kisit:'—' },
-      { ad:'Ali Yılmaz',   tc:'789 012 345 66', unvan:'Depo Sorumlusu',     grup:'Grup 2', giris:'10.06.2022', durum:'Aktif', renk:'#E6F1FB', tx:'#0C447C', init:'AY', egitimLamp:'lg', muayeneLamp:'la', kisit:'—' },
+    xyz:[
+      {ad:'Mustafa Kaya',tc:'345 678 901 22',gorev:'Forklift Op.',grup:'Grup 2',giris:'18.01.2023',durum:'Aktif',rk:'#E1F5EE',tx:'#085041',init:'MK',eL:'lg',mL:'lg',kisit:'—'},
+      {ad:'Ali Yılmaz',  tc:'789 012 345 66',gorev:'Depo Sorumlusu',grup:'Grup 2',giris:'10.06.2022',durum:'Aktif',rk:'#E6F1FB',tx:'#0C447C',init:'AY',eL:'lg',mL:'la',kisit:'—'},
     ],
-    bildirimler:[{ dot:'var(--amber)', txt:'Ali Yılmaz — muayene 22 gün kaldı' }]
-  },
-  { id:'demo', adi:'Demo Tekstil A.Ş.', sinif:'Az Tehlikeli', sinifKey:'az', iskolu:'Tekstil Üretimi', nace:'13.10', mail:'isg@demo-tekstil.com', calisanSayisi:75, egitimPct:95, muayenePct:93,
-    personel:[
-      { ad:'Selin Öz', tc:'890 123 456 77', unvan:'Üretim Operatörü', grup:'Grup 1', giris:'03.03.2023', durum:'Aktif', renk:'#E1F5EE', tx:'#085041', init:'SÖ', egitimLamp:'lg', muayeneLamp:'lg', kisit:'—' },
-    ],
-    bildirimler:[]
-  },
-];
+    iss:[{ad:'Selin Öz',tc:'890 123 456 77',gorev:'Temizlik Personeli',grup:'Grup 1',giris:'03.03.2023',durum:'Aktif',rk:'#E1F5EE',tx:'#085041',init:'SÖ',eL:'lg',mL:'lg',kisit:'—'}],
+    sec:[{ad:'Mehmet Can',tc:'901 234 567 88',gorev:'Güvenlik Görevlisi',grup:'Grup 2',giris:'14.07.2022',durum:'Aktif',rk:'#FAEEDA',tx:'#633806',init:'MC',eL:'lr',mL:'lr',kisit:'—'}],
+  }
+};
 
-let aktifFirma = null;
+let aktif=null,fp=[];
 
-function lampHTML(cls) {
-  const lbl = { lg:'Güncel', la:'Yaklaşıyor', lr:'Süresi Geçmiş' };
-  return `<span class="lamp ${cls}"><span class="lamp-dot"></span>${lbl[cls]}</span>`;
+// YARDIMCI
+function L(c,txt){const m={lg:'Güncel',la:'Yaklaşıyor',lr:'Geçmiş/Eksik'};return `<span class="lamp ${c}"><span class="ld"></span>${txt||m[c]}</span>`;}
+
+// KPI GLOBAL
+function renderKPI(){
+  document.getElementById('kpi-tbody').innerHTML=DB.firmalar.map(f=>{
+    const sb=f.sk==='cok'?'br':f.sk==='teh'?'ba':'bg';
+    const eL=f.egP>=90?'lg':f.egP>=70?'la':'lr';
+    const mL=f.muP>=90?'lg':f.muP>=70?'la':'lr';
+    return `<tr><td style="color:var(--t3);font-size:12px;">${f.no}</td><td style="font-weight:600;">${f.adi}</td><td>${f.cal}</td>
+      <td><div>${L(eL)}</div><div style="font-size:11px;color:var(--t3);">%${f.egP}</div></td>
+      <td><div>${L(mL)}</div><div style="font-size:11px;color:var(--t3);">%${f.muP}</div></td>
+      <td style="color:var(--re);font-weight:700;">${f.egE}</td>
+      <td style="color:var(--am);font-weight:700;">${f.muE}</td>
+      <td><button class="btn xs pr" onclick="goFirma('${f.id}')">Detay →</button></td>
+    </tr>`;
+  }).join('');
 }
 
-function renderFirmalar(data) {
-  document.getElementById('firma-tbody').innerHTML = data.map(f => {
-    const eb = f.sinifKey==='cok'?'bg-r':f.sinifKey==='teh'?'bg-a':'bg-g';
-    const eLamp = f.egitimPct>=90?'lg':f.egitimPct>=70?'la':'lr';
-    const mLamp = f.muayenePct>=90?'lg':f.muayenePct>=70?'la':'lr';
+// FİRMALAR LİSTESİ
+function renderFirmalar(data){
+  document.getElementById('firma-tbody').innerHTML=data.map(f=>{
+    const sb=f.sk==='cok'?'br':f.sk==='teh'?'ba':'bg';
     return `<tr>
+      <td style="color:var(--t3);font-size:12px;">${f.no}</td>
       <td style="font-weight:600;">${f.adi}</td>
-      <td><span class="badge ${eb}">${f.sinif}</span></td>
-      <td>${f.calisanSayisi}</td>
-      <td><div>${lampHTML(eLamp)}<div style="font-size:11px;color:var(--tx3);margin-top:2px;">%${f.egitimPct}</div></div></td>
-      <td><div>${lampHTML(mLamp)}<div style="font-size:11px;color:var(--tx3);margin-top:2px;">%${f.muayenePct}</div></div></td>
-      <td><button class="btn sm primary" onclick="goFirma('${f.id}')">İşlem Yap →</button></td>
+      <td><span class="bdg ${sb}">${f.sinif}</span></td>
+      <td>${f.cal}</td>
+      <td><span style="color:var(--re);font-weight:700;">${f.egE}</span></td>
+      <td><span style="color:var(--am);font-weight:700;">${f.muE}</span></td>
+      <td><button class="btn sm pr" onclick="goFirma('${f.id}')">İşlem Yap →</button></td>
     </tr>`;
   }).join('');
 }
+function filterFirma(v){renderFirmalar(DB.firmalar.filter(f=>f.adi.toLowerCase().includes(v.toLowerCase())));}
 
-function filterFirma(v) {
-  renderFirmalar(firmalar.filter(f => f.adi.toLowerCase().includes(v.toLowerCase())));
-}
-
-function goFirma(id) {
-  aktifFirma = firmalar.find(f => f.id === id);
-  if (!aktifFirma) return;
-  document.getElementById('tb-crumb').textContent = 'Firmalar /';
-  document.getElementById('tb-title').textContent = aktifFirma.adi;
+// FİRMA DETAY
+function goFirma(id){
+  aktif=DB.firmalar.find(f=>f.id===id);
+  if(!aktif)return;
+  // topbar
+  document.getElementById('tb-crumb').textContent='Firmalar';
+  document.getElementById('tb-sep').style.display='';
+  document.getElementById('tb-title').textContent=aktif.adi;
   document.getElementById('tb-back').classList.add('show');
-  document.getElementById('tb-right').innerHTML = `<button class="btn sm" onclick="openModal('modal-excel')">📥 Excel Yükle</button><button class="btn primary sm" onclick="openModal('modal-personel-ekle')">+ Personel Ekle</button>`;
-  document.getElementById('detay-firma-adi').textContent = aktifFirma.adi;
-  document.getElementById('df-adi').value    = aktifFirma.adi;
-  document.getElementById('df-sinif').value  = aktifFirma.sinifKey;
-  document.getElementById('df-iskolu').value = aktifFirma.iskolu;
-  document.getElementById('df-nace').value   = aktifFirma.nace;
-  document.getElementById('df-mail').value   = aktifFirma.mail;
-  updatePeriyot(aktifFirma.sinifKey);
-  const uyum = Math.round((aktifFirma.egitimPct + aktifFirma.muayenePct) / 2);
-  const yak  = Math.round((100 - uyum) * 0.6);
-  const gec  = 100 - uyum - yak;
-  document.getElementById('sp-guncel').textContent     = '%' + uyum;
-  document.getElementById('sp-guncel-bar').style.width = uyum + '%';
-  document.getElementById('sp-yaklasan').textContent     = '%' + yak;
-  document.getElementById('sp-yaklasan-bar').style.width = yak + '%';
-  document.getElementById('sp-gecmis').textContent     = '%' + gec;
-  document.getElementById('sp-gecmis-bar').style.width = gec + '%';
-  document.getElementById('sp-bildirimler').innerHTML = aktifFirma.bildirimler.length
-    ? aktifFirma.bildirimler.map(b => `<div class="alert-row"><div class="alert-dot" style="background:${b.dot};"></div><div>${b.txt}</div></div>`).join('')
-    : '<div style="font-size:12px;color:var(--tx3);">Bekleyen bildirim yok.</div>';
-  renderPersonel([...aktifFirma.personel]);
-  renderDurum(aktifFirma.personel, uyum);
-  goView('firma-detay');
-  switchDetay('bilgi');
+  document.getElementById('tb-right').innerHTML=`<button class="btn sm" onclick="openM('m-excel-yukle')">📥 Excel Yükle</button><button class="btn pr sm" onclick="openM('m-personel-ekle')">+ Personel Ekle</button>`;
+  // form
+  document.getElementById('d-firma-adi').textContent=aktif.adi;
+  document.getElementById('df-adi').value=aktif.adi;
+  document.getElementById('df-sinif').value=aktif.sk;
+  document.getElementById('df-iskolu').value=aktif.iskolu;
+  document.getElementById('df-nace').value=aktif.nace;
+  document.getElementById('df-mail').value=aktif.mail;
+  updatePeriyot(aktif.sk);
+  // uyum
+  const u=Math.round((aktif.egP+aktif.muP)/2);
+  const y=Math.round((100-u)*.55),e=100-u-y;
+  document.getElementById('sp-g').textContent='%'+u;document.getElementById('sp-g-b').style.width=u+'%';
+  document.getElementById('sp-y').textContent='%'+y;document.getElementById('sp-y-b').style.width=y+'%';
+  document.getElementById('sp-e').textContent='%'+e;document.getElementById('sp-e-b').style.width=e+'%';
+  document.getElementById('sp-bildirimler').innerHTML=aktif.bil.length
+    ?aktif.bil.map(b=>`<div class="ar"><div class="ad" style="background:${b.d};"></div><div>${b.t}</div></div>`).join('')
+    :'<div style="font-size:12px;color:var(--t3);">Bekleyen bildirim yok.</div>';
+  // personel
+  fp=[...(DB.personel[id]||[])];
+  renderPersonel(fp);
+  renderDurum(fp,u);
+  // firma KPI
+  renderFirmaKPI(aktif,u);
+  goView('detay');sd('bilgi');
 }
 
-function goBack() {
-  goView('firmalar');
-  aktifFirma = null;
-  document.getElementById('tb-crumb').textContent = '';
-  document.getElementById('tb-title').textContent = 'Firmalar';
+function goBack(){
+  goView('firmalar');aktif=null;
+  document.getElementById('tb-crumb').textContent='';
+  document.getElementById('tb-sep').style.display='none';
+  document.getElementById('tb-title').textContent='Firmalar';
   document.getElementById('tb-back').classList.remove('show');
-  document.getElementById('tb-right').innerHTML = '';
+  document.getElementById('tb-right').innerHTML='';
 }
 
-function renderPersonel(data) {
-  document.getElementById('personel-tbody').innerHTML = data.map(p => {
-    const bg = p.grup==='Grup 3'?'bg-r':p.grup==='Grup 2'?'bg-a':'bg-g';
+// PERSONEL
+function renderPersonel(data){
+  document.getElementById('personel-tbody').innerHTML=data.map(p=>{
+    const gb=p.grup==='Grup 3'?'br':p.grup==='Grup 2'?'ba':'bg';
     return `<tr>
-      <td><div class="person"><div class="avatar" style="background:${p.renk};color:${p.tx};">${p.init}</div><div><div style="font-weight:500;">${p.ad}</div><div style="font-size:11px;color:var(--tx3);">${p.unvan}</div></div></div></td>
-      <td style="font-size:12px;color:var(--tx3);">${p.tc}</td>
-      <td>${p.unvan}</td>
-      <td><span class="badge ${bg}">${p.grup}</span></td>
+      <td><div class="person"><div class="av" style="background:${p.rk};color:${p.tx};">${p.init}</div><div><div style="font-weight:500;">${p.ad}</div><div style="font-size:11px;color:var(--t3);">${p.gorev}</div></div></div></td>
+      <td style="font-size:12px;color:var(--t3);">${p.tc}</td>
+      <td style="font-size:13px;">${p.gorev}</td>
+      <td><span class="bdg ${gb}">${p.grup}</span></td>
       <td style="font-size:12px;">${p.giris}</td>
-      <td><span class="lamp ${p.durum==='Aktif'?'lg':'la'}"><span class="lamp-dot"></span>${p.durum}</span></td>
-      <td><button class="btn sm" onclick="toast('${p.ad} düzenleniyor…')">Düzenle</button></td>
+      <td><span class="lamp ${p.durum==='Aktif'?'lg':'la'}"><span class="ld"></span>${p.durum}</span></td>
+      <td style="white-space:nowrap;">
+        <button class="btn xs" onclick="toast('${p.ad} düzenleniyor…')">Düzenle</button>
+        ${p.durum==='Aktif'
+          ?`<button class="btn xs dg" onclick="toast('${p.ad} pasife çekildi, bildirim gönderildi ✓')">Pasife Al</button>`
+          :`<button class="btn xs" style="color:var(--gr);" onclick="toast('${p.ad} aktife alındı ✓')">Aktife Al</button>`}
+      </td>
     </tr>`;
   }).join('');
 }
+function filterPersonel(v){renderPersonel(fp.filter(p=>p.ad.toLowerCase().includes(v.toLowerCase())||p.tc.includes(v)));}
+function filterGrup(v){renderPersonel(v?fp.filter(p=>p.grup===v):[...fp]);}
+function filterDurum(v){renderPersonel(v?fp.filter(p=>p.durum===v):[...fp]);}
 
-function filterPersonel(v) {
-  renderPersonel(aktifFirma.personel.filter(p => p.ad.toLowerCase().includes(v.toLowerCase()) || p.tc.includes(v)));
-}
-function filterPersonelGrup(v) {
-  renderPersonel(v ? aktifFirma.personel.filter(p => p.grup === v) : [...aktifFirma.personel]);
-}
-
-function renderDurum(data, uyum) {
-  const saatMap = { 'Grup 3':'16/16', 'Grup 2':'12/12', 'Grup 1':'8/8' };
-  document.getElementById('durum-tbody').innerHTML = data.map(p => {
-    const bg = p.grup==='Grup 3'?'bg-r':p.grup==='Grup 2'?'bg-a':'bg-g';
+// DURUM
+function renderDurum(data,u){
+  const sh={'Grup 3':'16/16s','Grup 2':'12/12s','Grup 1':'8/8s'};
+  document.getElementById('durum-tbody').innerHTML=data.map(p=>{
+    const gb=p.grup==='Grup 3'?'br':p.grup==='Grup 2'?'ba':'bg';
     return `<tr>
-      <td><div class="person"><div class="avatar" style="background:${p.renk};color:${p.tx};font-size:10px;">${p.init}</div><div style="font-weight:500;">${p.ad}</div></div></td>
-      <td><span class="badge ${bg}">${p.grup}</span></td>
-      <td>${lampHTML(p.egitimLamp)}</td>
-      <td style="font-size:12px;">${saatMap[p.grup]||'—'}</td>
-      <td>${lampHTML(p.muayeneLamp)}</td>
-      <td style="font-size:12px;color:${p.kisit!=='—'?'var(--red)':'var(--tx3)'};font-weight:${p.kisit!=='—'?500:400};">${p.kisit}</td>
+      <td><div class="person"><div class="av" style="background:${p.rk};color:${p.tx};font-size:9px;">${p.init}</div><div style="font-weight:500;">${p.ad}</div></div></td>
+      <td><span class="bdg ${gb}">${p.grup}</span></td>
+      <td>${L(p.eL)}</td>
+      <td style="font-size:12px;">${sh[p.grup]||'—'}</td>
+      <td>${L(p.mL)}</td>
+      <td style="font-size:12px;">${p.giris}</td>
+      <td style="font-size:12px;color:${p.kisit!=='—'?'var(--re)':'var(--t3)'};font-weight:${p.kisit!=='—'?600:400};">${p.kisit}</td>
     </tr>`;
   }).join('');
-  document.getElementById('uyum-pct').textContent = '%' + (uyum || 0);
-  document.getElementById('uyum-bar').style.width = (uyum || 0) + '%';
+  document.getElementById('uyum-pct').textContent='%'+(u||0);
+  document.getElementById('uyum-bar').style.width=(u||0)+'%';
 }
 
-function updatePeriyot(val) {
-  const info = document.getElementById('periyot-info');
-  const g3t  = document.getElementById('g3-tavan');
-  const pg2  = document.getElementById('p-g2');
-  const pg1  = document.getElementById('p-g1');
-  if (val==='cok') { info.innerHTML='Bu firma <strong>Çok Tehlikeli</strong> olduğundan tüm gruplara <strong>1 Yıl</strong> tavan uygulanır.'; g3t.style.display='block'; pg2.style.opacity='.5'; pg1.style.opacity='.5'; }
-  else if (val==='teh') { info.innerHTML='Bu firma <strong>Tehlikeli</strong>. Grup 1 personele <strong>3 Yıl</strong> tavan uygulanır.'; g3t.style.display='none'; pg2.style.opacity='1'; pg1.style.opacity='.5'; }
-  else { info.innerHTML='Bu firma <strong>Az Tehlikeli</strong>. Her grup kendi yasal periyodunu kullanır.'; g3t.style.display='none'; pg2.style.opacity='.5'; pg1.style.opacity='1'; }
+// FİRMA KPI
+function renderFirmaKPI(f,u){
+  document.getElementById('firma-kpi-grid').innerHTML=`
+    <div class="sc"><div class="sc-l">Eğitim Uyum</div><div class="sc-v" style="color:${f.egP>=80?'var(--gr)':'var(--re)'}">%${f.egP}</div><div class="sc-s">Eksik: ${f.egE} kişi</div></div>
+    <div class="sc"><div class="sc-l">Muayene Uyum</div><div class="sc-v" style="color:${f.muP>=80?'var(--gr)':'var(--re)'}">%${f.muP}</div><div class="sc-s">Eksik: ${f.muE} kişi</div></div>
+    <div class="sc"><div class="sc-l">Genel Uyum</div><div class="sc-v" style="color:var(--gr)">%${u}</div><div class="sc-s">Hedef: %95</div></div>
+    <div class="sc"><div class="sc-l">Toplam Personel</div><div class="sc-v">${f.cal}</div><div class="sc-s">Aktif çalışan</div></div>`;
+  document.getElementById('firma-kpi-tablo').innerHTML=`
+    <div style="font-size:12px;color:var(--t2);line-height:2;">
+      <div>📊 Tehlike Sınıfı: <strong>${f.sinif}</strong></div>
+      <div>📧 Mail Grubu: <span style="color:var(--bl);">${f.mail}</span></div>
+      <div>🏭 İş Kolu: ${f.iskolu} · NACE: ${f.nace}</div>
+    </div>`;
 }
 
-function goView(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById('view-'+id).classList.add('active'); }
+// PERİYOT
+function updatePeriyot(v){
+  const info=document.getElementById('periyot-info');
+  const g3t=document.getElementById('g3-tavan'),pg2=document.getElementById('p-g2'),pg1=document.getElementById('p-g1');
+  if(v==='cok'){info.innerHTML='Bu firma <strong>Çok Tehlikeli</strong> — tüm gruplara <strong>1 Yıl</strong> tavan uygulanır.';g3t.style.display='block';pg2.style.opacity='.45';pg1.style.opacity='.45';}
+  else if(v==='teh'){info.innerHTML='Bu firma <strong>Tehlikeli</strong> — Grup 1 personele <strong>3 Yıl</strong> tavan uygulanır.';g3t.style.display='none';pg2.style.opacity='1';pg1.style.opacity='.45';}
+  else{info.innerHTML='Bu firma <strong>Az Tehlikeli</strong> — her grup kendi yasal periyodunu kullanır.';g3t.style.display='none';pg2.style.opacity='.45';pg1.style.opacity='1';}
+}
 
-function goModule(mod) {
-  goView(mod); aktifFirma = null;
-  document.querySelectorAll('.nav-item[id^="snav-"]').forEach(n => n.classList.remove('active'));
+// NAVİGASYON
+function goView(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('view-'+id).classList.add('active');}
+function goModule(mod){
+  goView(mod);aktif=null;
+  document.querySelectorAll('.ni[id^="snav-"]').forEach(n=>n.classList.remove('active'));
   document.getElementById('snav-'+mod).classList.add('active');
-  const t = {firmalar:'Firmalar',egitim:'Eğitim',saglik:'Sağlık'};
-  document.getElementById('tb-crumb').textContent=''; document.getElementById('tb-title').textContent=t[mod]||mod;
-  document.getElementById('tb-back').classList.remove('show'); document.getElementById('tb-right').innerHTML='';
+  const t={firmalar:'Firmalar',egitim:'Eğitim',saglik:'Sağlık',kpi:'KPI'};
+  document.getElementById('tb-crumb').textContent='';
+  document.getElementById('tb-sep').style.display='none';
+  document.getElementById('tb-title').textContent=t[mod]||mod;
+  document.getElementById('tb-back').classList.remove('show');
+  document.getElementById('tb-right').innerHTML='';
 }
+function sd(t){['bilgi','personel','durum','evrak','kpi'].forEach(x=>{
+  document.getElementById('dtab-'+x).classList.toggle('active',x===t);
+  document.getElementById('dtabv-'+x).classList.toggle('active',x===t);
+});}
+function se(t){['isg','diger','toplu'].forEach(x=>{document.getElementById('etab-'+x).classList.toggle('active',x===t);document.getElementById('etabv-'+x).classList.toggle('active',x===t);});}
+function ss2(t){['m','t'].forEach(x=>{document.getElementById('stab-'+x).classList.toggle('active',x===t);document.getElementById('stabv-'+x).classList.toggle('active',x===t);});}
 
-function switchDetay(tab) {
-  ['bilgi','personel','durum'].forEach(t => { document.getElementById('dtab-'+t).classList.toggle('active',t===tab); document.getElementById('dtabv-'+t).classList.toggle('active',t===tab); });
-}
-function switchEgitim(tab) {
-  ['yasal','diger','toplu'].forEach(t => { document.getElementById('etab-'+t).classList.toggle('active',t===tab); document.getElementById('etabv-'+t).classList.toggle('active',t===tab); });
-}
+// MODAL
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.ov').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+function showConfirm(){closeM('m-excel-yukle');setTimeout(()=>openM('m-confirm'),200);}
 
-function openModal(id)  { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-document.querySelectorAll('.overlay').forEach(m => m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); }));
+// CHECKLIST
+function toggleChk(el){el.closest('.chk').classList.toggle('checked',el.checked);}
 
-function toggleCheck(el) { el.closest('.check-item').classList.toggle('checked', el.checked); }
+// TOAST
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),3200);}
 
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 3000);
-}
-
-renderFirmalar(firmalar);
-document.querySelectorAll('.check-item input:checked').forEach(el => el.closest('.check-item').classList.add('checked'));
+// INIT
+renderFirmalar(DB.firmalar);
+renderKPI();
+document.querySelectorAll('.chk input:checked').forEach(el=>el.closest('.chk').classList.add('checked'));
 </script>
 </body>
 </html>
